@@ -262,7 +262,7 @@ Key options:
 
 | Argument | Default | Description |
 |---|---|---|
-| `--llm_model` | `openai/gpt-4.1-mini` | Any OpenRouter model slug |
+| `--llm_model` | `google/gemini-3.5-flash` | Any OpenRouter model slug |
 | `--adapter` | `model/deberta_absa_finetuned` | Path to saved LoRA adapter |
 | `--min_confidence` | `0.70` | Min LLM confidence to run ACSC on an aspect |
 | `--cache_dir` | `` | Directory to cache LLM responses across runs |
