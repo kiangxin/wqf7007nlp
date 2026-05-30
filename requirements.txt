@@ -1,0 +1,34 @@
+# ── Data & ML ──────────────────────────────────────────────────────────────
+torch
+torchvision  # not used directly; silences a transitive import error from transformers
+transformers
+peft
+accelerate
+datasets
+scikit-learn
+numpy
+
+# ── NLP utilities ───────────────────────────────────────────────────────────
+sentencepiece
+emoji
+contractions
+
+# ── Data handling ───────────────────────────────────────────────────────────
+pandas
+
+# ── LLM client (inference.py) ───────────────────────────────────────────────
+openai
+python-dotenv
+
+# ── Web server ──────────────────────────────────────────────────────────────
+fastapi
+uvicorn[standard]
+
+# ── Scraping ────────────────────────────────────────────────────────────────
+playwright
+
+# ── Notebook ────────────────────────────────────────────────────────────────
+jupyter
+ipykernel
+matplotlib
+langdetect

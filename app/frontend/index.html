@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABSA Analyzer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & Base ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Inter', sans-serif; background: #f1f5f9; color: #0f172a; }
+
+/* ── Layout ────────────────────────────────────────────────────────────────── */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Sidebar ───────────────────────────────────────────────────────────────── */
+.sidebar {
+  width: 230px; flex-shrink: 0;
+  background: #0f172a;
+  display: flex; flex-direction: column;
+  padding: 0;
+}
+.sb-brand {
+  padding: 1.5rem 1.25rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.sb-logo { font-size: 1rem; font-weight: 700; color: #f8fafc; letter-spacing: -0.02em; }
+.sb-sub  { font-size: 0.68rem; color: #475569; letter-spacing: 0.06em; text-transform: uppercase; margin-top: 3px; }
+
+.sb-nav { padding: 0.75rem 0.75rem; flex: 1; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0.6rem 0.85rem; border-radius: 10px;
+  font-size: 0.875rem; font-weight: 500; color: #94a3b8;
+  cursor: pointer; transition: background 0.15s, color 0.15s;
+  margin-bottom: 2px; user-select: none;
+}
+.nav-item:hover { background: rgba(255,255,255,0.06); color: #e2e8f0; }
+.nav-item.active { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+.nav-icon { font-size: 1rem; width: 20px; text-align: center; }
+
+/* ── Sidebar Model Info ────────────────────────────────────────────────────── */
+.sb-model-info {
+  padding: 0.9rem 1.25rem 1.1rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sb-model-title {
+  font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: #475569; margin-bottom: 0.65rem;
+}
+.sb-model-row {
+  display: flex; justify-content: space-between; align-items: baseline;
+  margin-bottom: 5px;
+}
+.sb-model-key { font-size: 0.71rem; color: #475569; flex-shrink: 0; }
+.sb-model-val {
+  font-size: 0.71rem; color: #64748b;
+  text-align: right; max-width: 130px; word-break: break-word;
+}
+.sb-model-val.highlight { color: #a5b4fc; font-weight: 600; }
+
+/* ── Main content ──────────────────────────────────────────────────────────── */
+.main {
+  flex: 1; overflow-y: auto;
+  padding: 2.25rem 2.5rem;
+  background: #f8fafc;
+}
+
+/* ── Page header ───────────────────────────────────────────────────────────── */
+.page-title { font-size: 1.6rem; font-weight: 700; color: #0f172a; letter-spacing: -0.025em; }
+.page-sub   { font-size: 0.86rem; color: #64748b; margin-top: 0.3rem; line-height: 1.6; }
+
+/* ── Domain tabs ───────────────────────────────────────────────────────────── */
+.domain-tabs {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin: 1.1rem 0 1.25rem;
+}
+.domain-tab {
+  padding: 6px 18px; border-radius: 99px;
+  border: 1.5px solid #e2e8f0; background: #fff;
+  font-size: 0.82rem; font-weight: 500; color: #64748b;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.domain-tab:hover { border-color: #a5b4fc; color: #4f46e5; background: #eef2ff; }
+.domain-tab.active { background: #0f172a; border-color: #0f172a; color: #fff; }
+.domain-tab-skeleton {
+  height: 33px; width: 100px; border-radius: 99px;
+  background: #e2e8f0; animation: shimmer 1.4s infinite;
+}
+
+/* ── Section label ─────────────────────────────────────────────────────────── */
+.section-label {
+  font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: #94a3b8; margin: 1.5rem 0 0.65rem;
+}
+
+/* ── Reviews table ─────────────────────────────────────────────────────────── */
+.table-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+table { width: 100%; border-collapse: collapse; }
+thead tr { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+thead th {
+  padding: 11px 16px; text-align: left;
+  font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #94a3b8;
+}
+thead th.col-num    { width: 48px; text-align: center; }
+thead th.col-source { width: 130px; }
+thead th.col-aspects{ width: 30%; }
+tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  cursor: pointer; transition: background 0.12s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: #f0f9ff; }
+tbody td { padding: 12px 16px; vertical-align: top; }
+tbody td.col-num {
+  text-align: center; color: #94a3b8;
+  font-size: 0.8rem; font-weight: 600; width: 48px;
+}
+.review-cell { font-size: 0.85rem; color: #1e293b; line-height: 1.55; }
+
+/* ── Source cell ───────────────────────────────────────────────────────────── */
+.source-cell  { display: flex; flex-direction: column; gap: 3px; }
+.source-name  { font-size: 0.78rem; color: #475569; font-weight: 500; }
+.source-stars { font-size: 0.72rem; color: #f59e0b; letter-spacing: 1.5px; }
+
+/* ── Aspect pills ──────────────────────────────────────────────────────────── */
+.aspect-pill {
+  display: inline-block; margin: 2px 3px 2px 0;
+  padding: 2px 9px; border-radius: 99px;
+  font-size: 0.72rem; font-weight: 500; white-space: nowrap;
+}
+.pill-pos { background: #f0fdf4; border: 1px solid #86efac; color: #16a34a; }
+.pill-neg { background: #fef2f2; border: 1px solid #fca5a5; color: #dc2626; }
+.pill-neu { background: #f8fafc; border: 1px solid #cbd5e1; color: #475569; }
+
+/* ── Pagination ────────────────────────────────────────────────────────────── */
+.pagination {
+  display: flex; align-items: center; justify-content: center;
+  gap: 6px; margin-top: 1.25rem;
+}
+.pg-btn {
+  min-width: 34px; height: 34px; padding: 0 10px;
+  border-radius: 8px; border: 1px solid #e2e8f0;
+  background: #fff; color: #475569;
+  font-size: 0.82rem; font-weight: 500; cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  display: flex; align-items: center; justify-content: center;
+}
+.pg-btn:hover:not(:disabled):not(.active) { background: #f1f5f9; }
+.pg-btn.active { background: #0f172a; color: #fff; border-color: #0f172a; }
+.pg-btn:disabled { opacity: 0.35; cursor: default; }
+.pg-info { font-size: 0.78rem; color: #94a3b8; margin: 0 6px; }
+
+/* ── Overlay & slide-over panel ────────────────────────────────────────────── */
+.overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(15,23,42,0.45);
+  backdrop-filter: blur(2px);
+  z-index: 100; animation: fadeIn 0.2s ease;
+}
+.overlay.show { display: block; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.detail-panel {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: min(520px, 90vw);
+  background: #fff;
+  box-shadow: -8px 0 40px rgba(15,23,42,0.14);
+  z-index: 101;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+}
+.detail-panel.open { transform: translateX(0); }
+
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+  position: sticky; top: 0; background: #fff; z-index: 10;
+}
+.panel-title { font-size: 0.95rem; font-weight: 600; color: #0f172a; }
+.panel-meta  { font-size: 0.74rem; color: #94a3b8; margin-top: 2px; }
+.panel-close {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid #e2e8f0; background: #f8fafc;
+  cursor: pointer; font-size: 1rem; color: #64748b;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.12s;
+}
+.panel-close:hover { background: #f1f5f9; }
+.panel-body { padding: 1.25rem 1.5rem; flex: 1; }
+
+/* ── Source badge (in panel header) ───────────────────────────────────────── */
+.panel-source {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  border-radius: 8px; padding: 5px 10px; margin-top: 6px;
+  font-size: 0.74rem;
+}
+.panel-source-company { color: #0f172a; font-weight: 600; }
+.panel-source-stars   { color: #f59e0b; }
+.panel-source-domain  { color: #94a3b8; }
+
+/* ── Annotated review box ──────────────────────────────────────────────────── */
+.review-box {
+  font-size: 0.93rem; line-height: 1.85; color: #0f172a;
+  padding: 14px 16px; border: 1.5px solid #e2e8f0; border-radius: 14px;
+  background: #ffffff; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.review-box.diffuse-positive { border-color: #86efac; box-shadow: 0 0 0 3px rgba(134,239,172,0.2); }
+.review-box.diffuse-negative { border-color: #fca5a5; box-shadow: 0 0 0 3px rgba(252,165,165,0.2); }
+.review-box.diffuse-neutral  { border-color: #cbd5e1; box-shadow: 0 0 0 3px rgba(203,213,225,0.2); }
+
+.hl-span { border-radius: 3px; padding: 1px 2px; transition: background 0.15s, box-shadow 0.15s, opacity 0.15s; }
+.hl-span[data-sentiment="positive"] { background: rgba(134,239,172,0.28); }
+.hl-span[data-sentiment="negative"] { background: rgba(252,165,165,0.28); }
+.hl-span[data-sentiment="neutral"]  { background: rgba(203,213,225,0.28); }
+.hl-span.hl-active[data-sentiment="positive"] { background: rgba(134,239,172,0.85); box-shadow: 0 0 0 1.5px #16a34a; }
+.hl-span.hl-active[data-sentiment="negative"] { background: rgba(252,165,165,0.85); box-shadow: 0 0 0 1.5px #dc2626; }
+.hl-span.hl-active[data-sentiment="neutral"]  { background: rgba(203,213,225,0.85); box-shadow: 0 0 0 1.5px #64748b; }
+.hl-span.hl-dimmed { opacity: 0.2; }
+
+/* ── Aspect chips ──────────────────────────────────────────────────────────── */
+.chip-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 0.25rem; }
+.chip {
+  display: inline-flex; flex-direction: column; gap: 4px;
+  padding: 11px 16px; border-radius: 14px; cursor: default;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  transition: transform 0.15s, box-shadow 0.15s;
+  min-width: 175px; position: relative;
+}
+.chip:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(0,0,0,0.1); }
+.chip-aspect { font-size: 0.82rem; font-weight: 600; line-height: 1.3; }
+.chip-meta   { font-size: 0.71rem; opacity: 0.65; }
+.chip-pos { background: #f0fdf4; border: 1.5px solid #86efac; color: #166534; }
+.chip-neg { background: #fef2f2; border: 1.5px solid #fca5a5; color: #991b1b; }
+.chip-neu { background: #f8fafc; border: 1.5px solid #cbd5e1; color: #475569; }
+
+.chip-tooltip {
+  display: none; position: absolute; bottom: calc(100% + 10px); left: 0;
+  background: #1e293b; color: #f1f5f9;
+  padding: 10px 14px; border-radius: 10px;
+  font-size: 0.77rem; line-height: 1.6;
+  width: 270px; z-index: 200; pointer-events: none;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.28); white-space: normal;
+}
+.chip:hover .chip-tooltip { display: block; }
+.tooltip-reasoning { color: #94a3b8; margin-bottom: 6px; }
+.tooltip-evidence  { color: #f8fafc; font-style: italic; }
+
+.no-result { color: #94a3b8; font-size: 0.88rem; font-style: italic; margin-top: 0.5rem; }
+
+/* ── Loading state ─────────────────────────────────────────────────────────── */
+.skeleton-row td { padding: 14px 16px; }
+.skeleton { height: 14px; border-radius: 6px; background: #e2e8f0; animation: shimmer 1.4s infinite; }
+.skeleton.short { width: 40%; }
+.skeleton.long  { width: 85%; }
+@keyframes shimmer {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.4; }
+}
+
+/* ── Views ─────────────────────────────────────────────────────────────────── */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ── Live analysis ─────────────────────────────────────────────────────────── */
+.live-wrap { max-width: 660px; }
+
+.form-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  margin-bottom: 1.25rem;
+}
+.form-row { margin-bottom: 1rem; }
+.form-row:last-child { margin-bottom: 0; }
+.form-label { font-size: 0.78rem; font-weight: 600; color: #475569; margin-bottom: 6px; display: block; }
+.form-input, .form-textarea, .form-select {
+  width: 100%; padding: 10px 13px;
+  border: 1.5px solid #e2e8f0; border-radius: 10px;
+  font-size: 0.9rem; font-family: 'Inter', sans-serif; color: #0f172a;
+  background: #fff; outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.1);
+}
+.form-textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
+
+.model-badge {
+  display: inline-flex; align-items: center; gap: 12px;
+  background: #f0fdf4; border: 1.5px solid #86efac;
+  border-radius: 12px; padding: 10px 18px; margin: 0 0 1.25rem;
+}
+.model-badge-icon { font-size: 1.2rem; }
+.model-badge-name { font-size: 0.88rem; font-weight: 600; color: #166534; }
+.model-badge-stats { font-size: 0.74rem; color: #16a34a; margin-top: 1px; }
+
+.btn-primary {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  background: #0f172a; color: #fff; border: none;
+  border-radius: 12px; padding: 0.7rem 1.6rem;
+  font-size: 0.9rem; font-weight: 600; font-family: 'Inter', sans-serif;
+  cursor: pointer; transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
+  box-shadow: 0 2px 8px rgba(15,23,42,0.18); width: 100%; margin-top: 4px;
+}
+.btn-primary:hover { background: #1e293b; transform: translateY(-1px); }
+.btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled { opacity: 0.5; cursor: default; transform: none; }
+
+.result-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; padding: 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.spinner {
+  width: 18px; height: 18px;
+  border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
+  border-radius: 50%; animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.error-msg {
+  background: #fef2f2; border: 1px solid #fca5a5;
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 0.85rem; color: #991b1b;
+}
+
+.conf-slider { width: 100%; accent-color: #6366f1; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ══ Sidebar ══════════════════════════════════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-logo">✦ ABSA Analyzer</div>
+      <div class="sb-sub">Sentiment Analysis</div>
+    </div>
+
+    <nav class="sb-nav">
+      <div class="nav-item active" data-view="browse" onclick="switchView('browse', this)">
+        <span class="nav-icon">📋</span> Pre-analyzed Reviews
+      </div>
+      <div class="nav-item" data-view="live" onclick="switchView('live', this)">
+        <span class="nav-icon">✦</span> Live Analysis
+      </div>
+    </nav>
+
+    <!-- Model Info -->
+    <div class="sb-model-info">
+      <div class="sb-model-title">Model Info</div>
+      <div class="sb-model-row">
+        <span class="sb-model-key">ACD</span>
+        <span class="sb-model-val" id="sb-acd-name">—</span>
+      </div>
+      <div class="sb-model-row">
+        <span class="sb-model-key">ACSC</span>
+        <span class="sb-model-val">DeBERTa-v3</span>
+      </div>
+      <div class="sb-model-row">
+        <span class="sb-model-key">Accuracy</span>
+        <span class="sb-model-val highlight" id="sb-acsc-acc">—</span>
+      </div>
+      <div class="sb-model-row">
+        <span class="sb-model-key">Macro F1</span>
+        <span class="sb-model-val highlight" id="sb-acsc-f1">—</span>
+      </div>
+      <div class="sb-model-row">
+        <span class="sb-model-key">Epochs</span>
+        <span class="sb-model-val" id="sb-acsc-epochs">—</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ══ Main content ══════════════════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- ── Browse view ─────────────────────────────────────────────────── -->
+    <div id="view-browse" class="view active">
+      <h1 class="page-title">Pre-analyzed Reviews</h1>
+      <p class="page-sub">Trustpilot customer reviews analyzed with the ABSA pipeline.
+        Click any row to see the full aspect breakdown.</p>
+
+      <!-- Domain switcher -->
+      <div id="domain-tabs" class="domain-tabs">
+        <div class="domain-tab-skeleton"></div>
+        <div class="domain-tab-skeleton" style="width:80px;"></div>
+      </div>
+
+      <div class="table-card">
+        <table>
+          <thead>
+            <tr>
+              <th class="col-num">#</th>
+              <th>Review</th>
+              <th class="col-source">Source</th>
+              <th class="col-aspects">Detected Aspects</th>
+            </tr>
+          </thead>
+          <tbody id="reviews-tbody">
+            <tr class="skeleton-row"><td class="col-num"><div class="skeleton short"></div></td><td><div class="skeleton long"></div></td><td><div class="skeleton short"></div></td><td><div class="skeleton short"></div></td></tr>
+            <tr class="skeleton-row"><td class="col-num"><div class="skeleton short"></div></td><td><div class="skeleton long"></div></td><td><div class="skeleton short"></div></td><td><div class="skeleton short"></div></td></tr>
+            <tr class="skeleton-row"><td class="col-num"><div class="skeleton short"></div></td><td><div class="skeleton long"></div></td><td><div class="skeleton short"></div></td><td><div class="skeleton short"></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination"></div>
+      <p id="pg-info" style="text-align:center;font-size:0.76rem;color:#94a3b8;margin-top:6px;"></p>
+    </div>
+
+    <!-- ── Live analysis view ───────────────────────────────────────────── -->
+    <div id="view-live" class="view">
+      <h1 class="page-title">Live Analysis</h1>
+      <p class="page-sub">Enter a customer review to analyze aspects in real time.</p>
+
+      <div class="live-wrap">
+        <div class="form-card">
+          <div class="form-row">
+            <label class="form-label">Customer Review</label>
+            <textarea id="review-input" class="form-textarea"
+              placeholder="e.g. Great app, but delivery took forever and the support team never replied to my email."></textarea>
+          </div>
+
+          <div class="form-row">
+            <label class="form-label">
+              Min LLM Confidence &nbsp;
+              <span id="conf-val" style="color:#6366f1;font-weight:600;">70%</span>
+            </label>
+            <input id="conf-slider" type="range" min="0" max="100" value="70" step="5"
+              class="conf-slider" oninput="document.getElementById('conf-val').textContent=this.value+'%'">
+          </div>
+
+          <button id="analyze-btn" class="btn-primary" onclick="runAnalysis()">
+            Analyze →
+          </button>
+        </div>
+
+        <div id="live-result"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ══ Overlay ════════════════════════════════════════════════════════════ -->
+<div id="overlay" class="overlay" onclick="closePanel()"></div>
+
+<!-- ══ Detail slide-over panel ════════════════════════════════════════════ -->
+<aside id="detail-panel" class="detail-panel">
+  <div class="panel-header">
+    <div style="flex:1;min-width:0;">
+      <div class="panel-title" id="panel-title">Review Detail</div>
+      <div id="panel-source-badge"></div>
+    </div>
+    <button class="panel-close" onclick="closePanel()">✕</button>
+  </div>
+  <div class="panel-body" id="panel-body"></div>
+</aside>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────────────────
+let currentPage   = 1;
+let totalPages    = 1;
+let pageData      = [];     // review objects for the current page
+let currentDomain = '';     // set after /api/domains loads
+
+// ── Navigation ─────────────────────────────────────────────────────────────────
+function switchView(name, el) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── Utility ────────────────────────────────────────────────────────────────────
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function titleCase(str) {
+  return str.replace(/\b\w/g, c => c.toUpperCase());
+}
+function shortCompany(company) {
+  // Take first 2 words, max 18 chars
+  const words = (company || '').split(' ');
+  const two = words.slice(0, 2).join(' ');
+  return two.length > 18 ? two.slice(0, 16) + '…' : two;
+}
+function starRating(n) {
+  if (!n) return '';
+  n = Math.min(5, Math.round(n));
+  return '★'.repeat(n) + '☆'.repeat(5 - n);
+}
+
+// ── Industry display names for domain keys ─────────────────────────────────────
+const DOMAIN_LABELS = {
+  banking:    'Banking',
+  it:         'IT',
+  software:   'Software',
+  fashion:    'Fashion',
+  food:       'Food',
+  shipping:   'Shipping',
+  ecommerce:  'E-Commerce',
+  household:  'Household',
+  logistics:  'Logistics',
+};
+
+// ── Domain tabs ────────────────────────────────────────────────────────────────
+async function loadDomains() {
+  try {
+    const res  = await fetch('/api/domains');
+    const data = await res.json();
+    const tabs = document.getElementById('domain-tabs');
+    tabs.innerHTML = '';
+
+    if (!data.domains || !data.domains.length) {
+      tabs.innerHTML = '<span style="font-size:0.82rem;color:#94a3b8;">No domains available.</span>';
+      return;
+    }
+
+    // Default to first domain
+    if (!currentDomain) currentDomain = data.domains[0].domain;
+
+    data.domains.forEach(d => {
+      const btn = document.createElement('button');
+      btn.className = 'domain-tab' + (d.domain === currentDomain ? ' active' : '');
+      btn.dataset.domain = d.domain;
+      // Label: industry name from mapping, fallback to title-cased domain key
+      const label = DOMAIN_LABELS[d.domain] || titleCase(d.domain);
+      btn.textContent = `${label}  (${d.n_reviews})`;
+      btn.onclick = () => switchDomain(d.domain);
+      tabs.appendChild(btn);
+    });
+
+    fetchReviews(1);
+  } catch (e) {
+    document.getElementById('domain-tabs').innerHTML =
+      `<span style="font-size:0.82rem;color:#dc2626;">Failed to load domains: ${e.message}</span>`;
+  }
+}
+
+function switchDomain(domain) {
+  currentDomain = domain;
+  document.querySelectorAll('.domain-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.domain === domain);
+  });
+  currentPage = 1;
+  fetchReviews(1);
+}
+
+// ── Aspect pill (for table) ────────────────────────────────────────────────────
+function aspectPill(r) {
+  const cls = {positive:'pill-pos', negative:'pill-neg', neutral:'pill-neu'}[r.sentiment] || 'pill-neu';
+  const icon = '●';
+  let name = r.aspect || '';
+  if (name.includes(': ')) name = name.split(': ')[1];
+  return `<span class="aspect-pill ${cls}">${icon} ${esc(titleCase(name))}</span>`;
+}
+
+// ── Table rendering ────────────────────────────────────────────────────────────
+function renderTable(reviews, startNum) {
+  const tbody = document.getElementById('reviews-tbody');
+  if (!reviews.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:#94a3b8;">No reviews found.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = reviews.map((entry, i) => {
+    const num = startNum + i;
+    const text = entry.review_text.length > 120
+      ? entry.review_text.slice(0, 120) + '…'
+      : entry.review_text;
+    const pills = entry.results
+      .filter(r => r.aspect_id !== 0)
+      .map(aspectPill).join('') || '<span style="color:#94a3b8;font-size:0.75rem;">No aspects</span>';
+    const sourceHtml = `<div class="source-cell">
+      <span class="source-name">${esc(shortCompany(entry.company || entry.domain || ''))}</span>
+      <span class="source-stars">${starRating(entry.rating)}</span>
+    </div>`;
+    return `<tr onclick="openPanel(${i}, ${num})">
+      <td class="col-num">${num}</td>
+      <td><span class="review-cell">${esc(text)}</span></td>
+      <td>${sourceHtml}</td>
+      <td>${pills}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Pagination ─────────────────────────────────────────────────────────────────
+function renderPagination(data) {
+  totalPages = data.n_pages;
+  const pg   = document.getElementById('pagination');
+  const info = document.getElementById('pg-info');
+
+  let html = `<button class="pg-btn" onclick="goPage(${data.page-1})" ${data.page<=1?'disabled':''}>← Prev</button>`;
+  for (let p = 1; p <= totalPages; p++) {
+    html += `<button class="pg-btn${p===data.page?' active':''}" onclick="goPage(${p})">${p}</button>`;
+  }
+  html += `<button class="pg-btn" onclick="goPage(${data.page+1})" ${data.page>=totalPages?'disabled':''}>Next →</button>`;
+  pg.innerHTML   = html;
+  info.textContent = `Page ${data.page} of ${totalPages}  ·  Reviews ${data.start}–${data.end} of ${data.total}`;
+}
+
+function goPage(p) {
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  fetchReviews(p);
+}
+
+// ── Fetch reviews ──────────────────────────────────────────────────────────────
+async function fetchReviews(page = 1) {
+  if (!currentDomain) return;
+  try {
+    const res  = await fetch(`/api/reviews?page=${page}&per_page=20&domain=${encodeURIComponent(currentDomain)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Server error');
+    pageData   = data.reviews;
+    renderTable(data.reviews, data.start);
+    renderPagination(data);
+  } catch (e) {
+    document.getElementById('reviews-tbody').innerHTML =
+      `<tr><td colspan="4" style="text-align:center;padding:2rem;color:#dc2626;">Failed to load: ${e.message}</td></tr>`;
+  }
+}
+
+// ── Slide-over panel ───────────────────────────────────────────────────────────
+function openPanel(pageIdx, reviewNum) {
+  const entry = pageData[pageIdx];
+  if (!entry) return;
+
+  document.getElementById('panel-title').textContent = `Review #${reviewNum}`;
+
+  // Source badge
+  const company  = entry.company || '';
+  const stars    = entry.rating  ? starRating(entry.rating) : '';
+  const domain   = entry.domain  ? titleCase(entry.domain)  : '';
+  const reviewer = entry.reviewer || '';
+  document.getElementById('panel-source-badge').innerHTML = company
+    ? `<div class="panel-source">
+        <span class="panel-source-company">${esc(company)}</span>
+        ${stars ? `<span class="panel-source-stars">${stars}</span>` : ''}
+        ${domain ? `<span class="panel-source-domain">· ${esc(domain)}</span>` : ''}
+        ${reviewer ? `<span class="panel-source-domain">· ${esc(reviewer)}</span>` : ''}
+       </div>`
+    : '';
+
+  document.getElementById('panel-body').innerHTML = buildResultsHtml(entry.review_text, entry.results);
+
+  document.getElementById('overlay').classList.add('show');
+  document.getElementById('detail-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closePanel() {
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('detail-panel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePanel(); });
+
+// ── Annotated review text ──────────────────────────────────────────────────────
+function annotateText(reviewText, results) {
+  let intervals = [];
+  results.forEach(r => {
+    if (r.aspect_id === 0 || r.evidence_type === 'diffuse') return;
+    (r.evidence_spans || []).forEach(span => {
+      if (!span) return;
+      let idx = reviewText.indexOf(span);
+      if (idx === -1) idx = reviewText.toLowerCase().indexOf(span.toLowerCase());
+      if (idx === -1) return;
+      intervals.push({ start: idx, end: idx + span.length, aid: String(r.aspect_id), sent: r.sentiment });
+    });
+  });
+
+  if (!intervals.length) return esc(reviewText).replace(/\n/g, '<br>');
+
+  intervals.sort((a, b) => a.start !== b.start ? a.start - b.start : (b.end - b.start) - (a.end - a.start));
+  let merged = [], prevEnd = -1;
+  intervals.forEach(iv => {
+    if (iv.start < prevEnd) return;
+    merged.push(iv); prevEnd = iv.end;
+  });
+
+  let html = '', cursor = 0;
+  merged.forEach(({ start, end, aid, sent }) => {
+    if (start > cursor) html += esc(reviewText.slice(cursor, start));
+    html += `<span class="hl-span" data-aspect-id="${aid}" data-sentiment="${sent}">${esc(reviewText.slice(start, end))}</span>`;
+    cursor = end;
+  });
+  if (cursor < reviewText.length) html += esc(reviewText.slice(cursor));
+  return html.replace(/\n/g, '<br>');
+}
+
+// ── Full chip view ─────────────────────────────────────────────────────────────
+function buildResultsHtml(reviewText, results) {
+  const CLS   = { positive:'chip-pos', negative:'chip-neg', neutral:'chip-neu' };
+  const LABEL = { positive:'● Positive', negative:'● Negative', neutral:'● Neutral' };
+
+  const noAspect = results.length === 1 && results[0].aspect_id === 0;
+  const annotated = annotateText(reviewText, results);
+
+  const reviewSection = `
+    <p class="section-label">Review</p>
+    <div class="review-box" id="panel-review-box">${annotated}</div>
+  `;
+
+  if (noAspect) {
+    return reviewSection +
+      '<p class="section-label">Detected Aspects</p>' +
+      '<p class="no-result">No relevant aspect detected in this review.</p>';
+  }
+
+  const jsLeave = `
+    document.querySelectorAll('#detail-panel .hl-span')
+      .forEach(e => e.classList.remove('hl-active','hl-dimmed'));
+    const rb = document.getElementById('panel-review-box');
+    if (rb) rb.className = rb.className.replace(/\\bdiffuse-\\S+/g,'').trim();
+  `.replace(/\s+/g,' ');
+
+  let chips = '<div class="chip-row">';
+  results.forEach(r => {
+    if (r.aspect_id === 0) return;
+    const sent  = r.sentiment;
+    const cls   = CLS[sent] || 'chip-neu';
+    const label = LABEL[sent] || sent;
+    const llm   = r.llm_confidence  != null ? `LLM ${Math.round(r.llm_confidence*100)}%`    : '';
+    const absa  = r.absa_confidence != null ? `ABSA ${(r.absa_confidence*100).toFixed(1)}%`  : '';
+    const meta  = [llm, absa].filter(Boolean).join(' · ');
+    const reason = esc(r.reasoning || '');
+    const spans  = r.evidence_spans || [];
+    const isDiff = r.evidence_type === 'diffuse' || !spans.length;
+
+    let jsEnter;
+    if (isDiff) {
+      jsEnter = `document.getElementById('panel-review-box').classList.add('diffuse-${sent}');`;
+    } else {
+      const aid = r.aspect_id;
+      jsEnter = `(function(){var id='${aid}';document.querySelectorAll('#detail-panel .hl-span').forEach(function(e){var m=e.dataset.aspectId===String(id);e.classList.toggle('hl-active',m);e.classList.toggle('hl-dimmed',!m);});})();`;
+    }
+
+    const evHtml = isDiff
+      ? '<em>Whole-review sentiment</em>'
+      : (spans.map(s => `&ldquo;${esc(s)}&rdquo;`).join(' &nbsp;·&nbsp; ') || '<em>No specific span</em>');
+
+    chips += `
+      <div class="chip ${cls}" onmouseenter="${esc(jsEnter)}" onmouseleave="${esc(jsLeave)}">
+        <span class="chip-aspect">${esc(titleCase(r.aspect))}</span>
+        <span class="chip-meta">${label}${meta ? '&nbsp;&nbsp;' + meta : ''}</span>
+        <div class="chip-tooltip">
+          <div class="tooltip-reasoning">${reason}</div>
+          <div class="tooltip-evidence">${evHtml}</div>
+        </div>
+      </div>`;
+  });
+  chips += '</div>';
+
+  return reviewSection + '<p class="section-label">Detected Aspects</p>' + chips;
+}
+
+// ── Live analysis ──────────────────────────────────────────────────────────────
+async function runAnalysis() {
+  const text    = document.getElementById('review-input').value.trim();
+  const minConf = parseInt(document.getElementById('conf-slider').value) / 100;
+  const btn     = document.getElementById('analyze-btn');
+  const result  = document.getElementById('live-result');
+
+  if (!text) { result.innerHTML = '<div class="error-msg">Please enter a review.</div>'; return; }
+
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Analyzing…';
+  result.innerHTML = '';
+
+  try {
+    const res  = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text, min_confidence: minConf }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Server error');
+    result.innerHTML = `<div class="result-card">${buildResultsHtml(text, data.results)}</div>`;
+  } catch (e) {
+    result.innerHTML = `<div class="error-msg">Error: ${esc(e.message)}</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Analyze →';
+  }
+}
+
+// ── Load server config → sidebar model info ────────────────────────────────────
+async function loadConfig() {
+  try {
+    const res  = await fetch('/api/config');
+    const data = await res.json();
+
+    // Sidebar: ACD name (shorten e.g. "google/gemini-3.5-flash" → "Gemini 3.5 Flash")
+    const acdEl = document.getElementById('sb-acd-name');
+    if (acdEl && data.llm_model) {
+      const name = data.llm_model.split('/').pop()
+        .replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+      acdEl.textContent = name;
+    }
+
+    // Sidebar: ACSC metrics
+    const accEl    = document.getElementById('sb-acsc-acc');
+    const f1El     = document.getElementById('sb-acsc-f1');
+    const epochsEl = document.getElementById('sb-acsc-epochs');
+    if (accEl    && data.acsc_accuracy != null) accEl.textContent    = data.acsc_accuracy + '%';
+    if (f1El     && data.acsc_macro_f1 != null) f1El.textContent     = data.acsc_macro_f1 + '%';
+    if (epochsEl && data.acsc_epochs   != null) epochsEl.textContent = data.acsc_epochs;
+  } catch (_) { /* ignore — model info will stay as — */ }
+}
+
+// ── Boot ───────────────────────────────────────────────────────────────────────
+loadConfig();
+loadDomains();   // loads tabs → fetchReviews for first domain
+</script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# Data & models (large files)
+*.csv
+*.tsv
+*.json
+*.jsonl
+*.pkl
+*.pickle
+*.pt
+*.pth
+*.bin
+*.h5
+*.hdf5
+*.safetensors
+
+# Keep only the final fine-tuned adapter, not intermediate checkpoints
+!dev/model/deberta_absa_finetuned/adapter_model.safetensors
+checkpoint-*/
+
+# Logs & output
+*.log
+logs/
+runs/
+outputs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment variables
+.env
+# .env.*
+
+# Pytest / coverage
+.pytest_cache/
+.coverage
+htmlcov/
