@@ -806,7 +806,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--base_model",  default="yangheng/deberta-v3-base-absa-v1.1")
     parser.add_argument("--adapter",     default=str(_HERE / "model" / "deberta_absa_finetuned"))
-    parser.add_argument("--llm_model",   default="openai/gpt-4.1-mini",
+    parser.add_argument("--llm_model",   default="google/gemini-3.5-flash",
                         help="Any OpenRouter model slug")
     parser.add_argument("--api_key",     default="",
                         help="OpenRouter API key (or set OPENROUTER_API_KEY env var)")
