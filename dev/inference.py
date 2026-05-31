@@ -78,7 +78,7 @@ load_dotenv()
 warnings.filterwarnings("ignore")
 
 # Prompt version — bump when you change SYSTEM_PROMPT so the cache invalidates
-PROMPT_VERSION = "v2"
+PROMPT_VERSION = "v3"
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Aspect catalogue
@@ -183,7 +183,10 @@ Review: "The weather was nice today."
 {"detected_aspects":[],"irrelevant":true}\
 """
 
-USER_PROMPT_TEMPLATE = 'Review: """{text}"""'
+def _build_user_prompt(text: str, context: str | None = None) -> str:
+    if context:
+        return f"Context: {context}\nReview: \"\"\"{text}\"\"\""
+    return f'Review: """{text}"""'
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -256,6 +259,7 @@ def extract_aspects_llm(
     stats: RunStats,
     max_retries: int = 3,
     timeout: int = 30,
+    context: str | None = None,
 ) -> dict:
     """
     Ask the LLM which aspects are mentioned, with evidence spans, per-aspect
@@ -272,7 +276,7 @@ def extract_aspects_llm(
                 model=model,
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user",   "content": USER_PROMPT_TEMPLATE.format(text=text)},
+                    {"role": "user",   "content": _build_user_prompt(text, context)},
                 ],
                 temperature=0,
                 max_tokens=4096,
@@ -320,14 +324,15 @@ class LLMCache:
         if self.enabled:
             self.dir.mkdir(parents=True, exist_ok=True)
 
-    def _key(self, text: str, model: str) -> str:
-        h = hashlib.sha256(f"{text}|{model}|{PROMPT_VERSION}".encode("utf-8")).hexdigest()
+    def _key(self, text: str, model: str, context: str | None = None) -> str:
+        ctx = context or ""
+        h = hashlib.sha256(f"{text}|{model}|{PROMPT_VERSION}|{ctx}".encode("utf-8")).hexdigest()
         return h
 
-    def get(self, text: str, model: str) -> dict | None:
+    def get(self, text: str, model: str, context: str | None = None) -> dict | None:
         if not self.enabled:
             return None
-        f = self.dir / f"{self._key(text, model)}.json"
+        f = self.dir / f"{self._key(text, model, context)}.json"
         if f.exists():
             try:
                 return json.loads(f.read_text(encoding="utf-8"))
@@ -335,10 +340,10 @@ class LLMCache:
                 return None
         return None
 
-    def set(self, text: str, model: str, value: dict) -> None:
+    def set(self, text: str, model: str, value: dict, context: str | None = None) -> None:
         if not self.enabled:
             return
-        f = self.dir / f"{self._key(text, model)}.json"
+        f = self.dir / f"{self._key(text, model, context)}.json"
         try:
             f.write_text(json.dumps(value, ensure_ascii=False), encoding="utf-8")
         except Exception:
@@ -351,15 +356,15 @@ def extract_aspects_llm_cached(
     model: str,
     stats: RunStats,
     cache: LLMCache,
+    context: str | None = None,
 ) -> dict:
-    cached = cache.get(text, model)
+    cached = cache.get(text, model, context)
     if cached is not None:
         stats.llm_cache_hits += 1
         return cached
-    result = extract_aspects_llm(client, text, model, stats)
-    # Only cache successful (non-error) results
+    result = extract_aspects_llm(client, text, model, stats, context=context)
     if "_error" not in result:
-        cache.set(text, model, result)
+        cache.set(text, model, result, context)
     return result
 
 
@@ -560,11 +565,12 @@ def run_pipeline(
     stats: RunStats,
     cache: LLMCache,
     min_confidence: float = 0.70,
+    context: str | None = None,
 ) -> list[dict]:
     stats.reviews_processed += 1
 
     clean = clean_text(text)
-    llm_output = extract_aspects_llm_cached(llm_client, text, llm_model, stats, cache)
+    llm_output = extract_aspects_llm_cached(llm_client, text, llm_model, stats, cache, context)
 
     if llm_output.get("irrelevant") or not llm_output.get("detected_aspects"):
         return [{
@@ -748,6 +754,7 @@ def main(args):
                     text, llm_client, args.llm_model,
                     absa_model, tokenizer, device, args.max_length,
                     stats, cache, args.min_confidence,
+                    context=args.context or None,
                 )
                 for r in results:
                     records.append({
@@ -777,6 +784,7 @@ def main(args):
                 args.text, llm_client, args.llm_model,
                 absa_model, tokenizer, device, args.max_length,
                 stats, cache, args.min_confidence,
+                context=args.context or None,
             )
             fmt_results(results)
             return
@@ -791,6 +799,7 @@ def main(args):
                 text, llm_client, args.llm_model,
                 absa_model, tokenizer, device, args.max_length,
                 stats, cache, args.min_confidence,
+                context=args.context or None,
             )
             fmt_results(results)
             print()
@@ -811,6 +820,8 @@ if __name__ == "__main__":
     parser.add_argument("--api_key",     default="",
                         help="OpenRouter API key (or set OPENROUTER_API_KEY env var)")
     parser.add_argument("--text",        default="")
+    parser.add_argument("--context",     default="",
+                        help="Optional source context prepended to each review (e.g. 'Banking app — Trustpilot')")
     parser.add_argument("--input",       default="", help="CSV with a 'text' column")
     parser.add_argument("--output",      default="predictions.csv")
     parser.add_argument("--max_length",     type=int,   default=256)

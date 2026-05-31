@@ -53,6 +53,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
+external/
 
 # Environment variables
 .env

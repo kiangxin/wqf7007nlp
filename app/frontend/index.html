@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ABSA Analyzer</title>
+<title>Review Insights — ABSA</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -87,6 +87,56 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: #f1f5f9
 .domain-tab-skeleton {
   height: 33px; width: 100px; border-radius: 99px;
   background: #e2e8f0; animation: shimmer 1.4s infinite;
+}
+
+/* ── Stats card ────────────────────────────────────────────────────────────── */
+.stats-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  margin-bottom: 1.25rem;
+}
+.stats-card-skeleton {
+  height: 130px; background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; padding: 1.25rem 1.5rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  margin-bottom: 1.25rem;
+  animation: shimmer 1.4s infinite;
+}
+.stats-top-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 1rem;
+}
+.stats-company { font-size: 1rem; font-weight: 700; color: #0f172a; }
+.stats-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: #f1f5f9; border: 1px solid #e2e8f0;
+  border-radius: 99px; padding: 3px 10px;
+  font-size: 0.72rem; color: #64748b; white-space: nowrap;
+}
+.stats-bars { display: flex; flex-direction: column; gap: 7px; margin-bottom: 1rem; }
+.stat-bar-item { display: flex; align-items: center; gap: 10px; }
+.stat-bar-label { font-size: 0.76rem; color: #475569; width: 56px; flex-shrink: 0; }
+.stat-bar-track {
+  flex: 1; height: 7px;
+  background: #f1f5f9; border-radius: 99px; overflow: hidden;
+}
+.stat-bar-fill { height: 100%; border-radius: 99px; transition: width 0.6s cubic-bezier(0.4,0,0.2,1); }
+.stat-bar-fill.bar-pos { background: #4ade80; }
+.stat-bar-fill.bar-neg { background: #f87171; }
+.stat-bar-fill.bar-neu { background: #94a3b8; }
+.stat-bar-count { font-size: 0.74rem; color: #64748b; width: 68px; text-align: right; flex-shrink: 0; }
+.stats-divider { height: 1px; background: #f1f5f9; margin: 0.85rem 0 0.75rem; }
+.stats-top-row2 { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.stats-top-label {
+  font-size: 0.65rem; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-right: 2px; flex-shrink: 0;
+}
+.stats-aspect-tag {
+  display: inline-block; padding: 2px 8px; border-radius: 99px;
+  background: #f8fafc; border: 1px solid #e2e8f0;
+  font-size: 0.72rem; color: #475569;
 }
 
 /* ── Section label ─────────────────────────────────────────────────────────── */
@@ -296,14 +346,31 @@ tbody td.col-num {
 }
 .form-textarea { resize: vertical; min-height: 130px; line-height: 1.6; }
 
-.model-badge {
-  display: inline-flex; align-items: center; gap: 12px;
-  background: #f0fdf4; border: 1.5px solid #86efac;
-  border-radius: 12px; padding: 10px 18px; margin: 0 0 1.25rem;
+/* ── Context section ───────────────────────────────────────────────────────── */
+.context-section {
+  background: #f8fafc; border: 1.5px solid #e2e8f0;
+  border-radius: 12px; padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
 }
-.model-badge-icon { font-size: 1.2rem; }
-.model-badge-name { font-size: 0.88rem; font-weight: 600; color: #166534; }
-.model-badge-stats { font-size: 0.74rem; color: #16a34a; margin-top: 1px; }
+.context-section-title {
+  font-size: 0.7rem; font-weight: 700; color: #64748b;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  margin-bottom: 0.75rem;
+}
+.context-optional {
+  font-size: 0.68rem; font-weight: 400; color: #94a3b8;
+  text-transform: none; letter-spacing: 0; margin-left: 6px;
+}
+.context-fields { display: flex; gap: 10px; margin-bottom: 0.65rem; }
+.context-field { flex: 1; }
+.context-field-label {
+  font-size: 0.72rem; font-weight: 600; color: #64748b;
+  margin-bottom: 4px; display: block;
+}
+.context-preview {
+  font-size: 0.76rem; color: #6366f1; font-style: italic;
+  line-height: 1.4; min-height: 1.2em;
+}
 
 .btn-primary {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
@@ -317,11 +384,24 @@ tbody td.col-num {
 .btn-primary:active { transform: translateY(0); }
 .btn-primary:disabled { opacity: 0.5; cursor: default; transform: none; }
 
+/* ── Live result card ──────────────────────────────────────────────────────── */
 .result-card {
   background: #fff; border: 1px solid #e2e8f0;
   border-radius: 16px; padding: 1.5rem;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   animation: slideUp 0.25s ease;
+}
+.result-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 0.75rem; padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.result-title { font-size: 0.88rem; font-weight: 600; color: #0f172a; }
+.result-context-tag {
+  display: inline-flex; align-items: center; gap: 5px;
+  background: #eef2ff; border: 1px solid #c7d2fe;
+  border-radius: 99px; padding: 2px 10px;
+  font-size: 0.7rem; color: #4f46e5; font-style: italic;
 }
 @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -347,16 +427,16 @@ tbody td.col-num {
   <!-- ══ Sidebar ══════════════════════════════════════════════════════════ -->
   <aside class="sidebar">
     <div class="sb-brand">
-      <div class="sb-logo">✦ ABSA Analyzer</div>
-      <div class="sb-sub">Sentiment Analysis</div>
+      <div class="sb-logo">✦ Review Insights</div>
+      <div class="sb-sub">Aspect-Based Sentiment</div>
     </div>
 
     <nav class="sb-nav">
       <div class="nav-item active" data-view="browse" onclick="switchView('browse', this)">
-        <span class="nav-icon">📋</span> Pre-analyzed Reviews
+        <span class="nav-icon">📋</span> Review Explorer
       </div>
       <div class="nav-item" data-view="live" onclick="switchView('live', this)">
-        <span class="nav-icon">✦</span> Live Analysis
+        <span class="nav-icon">✦</span> Analyze Review
       </div>
     </nav>
 
@@ -391,9 +471,9 @@ tbody td.col-num {
 
     <!-- ── Browse view ─────────────────────────────────────────────────── -->
     <div id="view-browse" class="view active">
-      <h1 class="page-title">Pre-analyzed Reviews</h1>
-      <p class="page-sub">Trustpilot customer reviews analyzed with the ABSA pipeline.
-        Click any row to see the full aspect breakdown.</p>
+      <h1 class="page-title">Review Explorer</h1>
+      <p class="page-sub">Pre-analyzed Trustpilot customer reviews across 4 industries.
+        Click any row to see the full aspect breakdown with evidence highlights.</p>
 
       <!-- Domain switcher -->
       <div id="domain-tabs" class="domain-tabs">
@@ -401,12 +481,15 @@ tbody td.col-num {
         <div class="domain-tab-skeleton" style="width:80px;"></div>
       </div>
 
+      <!-- Domain stats card -->
+      <div id="stats-container"></div>
+
       <div class="table-card">
         <table>
           <thead>
             <tr>
               <th class="col-num">#</th>
-              <th>Review</th>
+              <th>Customer Review</th>
               <th class="col-source">Source</th>
               <th class="col-aspects">Detected Aspects</th>
             </tr>
@@ -426,11 +509,44 @@ tbody td.col-num {
 
     <!-- ── Live analysis view ───────────────────────────────────────────── -->
     <div id="view-live" class="view">
-      <h1 class="page-title">Live Analysis</h1>
-      <p class="page-sub">Enter a customer review to analyze aspects in real time.</p>
+      <h1 class="page-title">Analyze a Review</h1>
+      <p class="page-sub">Enter any customer review to detect aspect categories and their sentiments in real time.</p>
 
       <div class="live-wrap">
         <div class="form-card">
+
+          <!-- Context section -->
+          <div class="context-section">
+            <div class="context-section-title">
+              Review Context
+              <span class="context-optional">optional — improves aspect detection accuracy</span>
+            </div>
+            <div class="context-fields">
+              <div class="context-field">
+                <label class="context-field-label">Company Name</label>
+                <input id="ctx-company" class="form-input"
+                  placeholder="e.g. HSBC UK Business Banking"
+                  oninput="updateContextPreview()">
+              </div>
+              <div class="context-field">
+                <label class="context-field-label">Industry</label>
+                <select id="ctx-industry" class="form-select" onchange="updateContextPreview()">
+                  <option value="">— select —</option>
+                  <option value="Banking">Banking</option>
+                  <option value="IT">IT</option>
+                  <option value="E-Commerce">E-Commerce</option>
+                  <option value="Fashion">Fashion</option>
+                  <option value="Retail">Retail</option>
+                  <option value="Healthcare">Healthcare</option>
+                  <option value="Travel">Travel</option>
+                  <option value="Food & Beverage">Food &amp; Beverage</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="context-preview" id="ctx-preview"></div>
+          </div>
+
           <div class="form-row">
             <label class="form-label">Customer Review</label>
             <textarea id="review-input" class="form-textarea"
@@ -477,8 +593,8 @@ tbody td.col-num {
 // ── State ──────────────────────────────────────────────────────────────────────
 let currentPage   = 1;
 let totalPages    = 1;
-let pageData      = [];     // review objects for the current page
-let currentDomain = '';     // set after /api/domains loads
+let pageData      = [];
+let currentDomain = '';
 
 // ── Navigation ─────────────────────────────────────────────────────────────────
 function switchView(name, el) {
@@ -498,7 +614,6 @@ function titleCase(str) {
   return str.replace(/\b\w/g, c => c.toUpperCase());
 }
 function shortCompany(company) {
-  // Take first 2 words, max 18 chars
   const words = (company || '').split(' ');
   const two = words.slice(0, 2).join(' ');
   return two.length > 18 ? two.slice(0, 16) + '…' : two;
@@ -508,18 +623,20 @@ function starRating(n) {
   n = Math.min(5, Math.round(n));
   return '★'.repeat(n) + '☆'.repeat(5 - n);
 }
+function shortAspectName(aspect) {
+  if (!aspect) return '';
+  return aspect.includes(': ') ? aspect.split(': ')[1] : aspect;
+}
 
-// ── Industry display names for domain keys ─────────────────────────────────────
+// ── Industry display names ─────────────────────────────────────────────────────
 const DOMAIN_LABELS = {
-  banking:    'Banking',
-  it:         'IT',
-  software:   'Software',
-  fashion:    'Fashion',
-  food:       'Food',
-  shipping:   'Shipping',
-  ecommerce:  'E-Commerce',
-  household:  'Household',
-  logistics:  'Logistics',
+  banking:   'Banking',
+  it:        'IT',
+  ecommerce: 'E-Commerce',
+  fashion:   'Fashion',
+  software:  'Software',
+  food:      'Food',
+  shipping:  'Shipping',
 };
 
 // ── Domain tabs ────────────────────────────────────────────────────────────────
@@ -535,14 +652,12 @@ async function loadDomains() {
       return;
     }
 
-    // Default to first domain
     if (!currentDomain) currentDomain = data.domains[0].domain;
 
     data.domains.forEach(d => {
       const btn = document.createElement('button');
       btn.className = 'domain-tab' + (d.domain === currentDomain ? ' active' : '');
       btn.dataset.domain = d.domain;
-      // Label: industry name from mapping, fallback to title-cased domain key
       const label = DOMAIN_LABELS[d.domain] || titleCase(d.domain);
       btn.textContent = `${label}  (${d.n_reviews})`;
       btn.onclick = () => switchDomain(d.domain);
@@ -550,6 +665,7 @@ async function loadDomains() {
     });
 
     fetchReviews(1);
+    loadStats(currentDomain);
   } catch (e) {
     document.getElementById('domain-tabs').innerHTML =
       `<span style="font-size:0.82rem;color:#dc2626;">Failed to load domains: ${e.message}</span>`;
@@ -563,15 +679,71 @@ function switchDomain(domain) {
   });
   currentPage = 1;
   fetchReviews(1);
+  loadStats(domain);
+}
+
+// ── Domain stats card ──────────────────────────────────────────────────────────
+async function loadStats(domain) {
+  const container = document.getElementById('stats-container');
+  container.innerHTML = '<div class="stats-card-skeleton"></div>';
+  try {
+    const res  = await fetch(`/api/stats?domain=${encodeURIComponent(domain)}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'error');
+    container.innerHTML = buildStatsHtml(data);
+  } catch (_) {
+    container.innerHTML = '';
+  }
+}
+
+function buildStatsHtml(stats) {
+  const sc    = stats.sentiment_counts || {};
+  const pos   = sc.positive || 0;
+  const neg   = sc.negative || 0;
+  const neu   = sc.neutral  || 0;
+  const total = stats.total_aspects || (pos + neg + neu) || 1;
+  const pct   = n => Math.round((n / total) * 100);
+
+  const domainLabel = DOMAIN_LABELS[stats.domain] || titleCase(stats.domain || '');
+
+  const bars = [
+    { label: 'Positive', cls: 'bar-pos', count: pos },
+    { label: 'Negative', cls: 'bar-neg', count: neg },
+    { label: 'Neutral',  cls: 'bar-neu', count: neu },
+  ].map(b => {
+    const p = pct(b.count);
+    return `<div class="stat-bar-item">
+      <span class="stat-bar-label">${b.label}</span>
+      <div class="stat-bar-track">
+        <div class="stat-bar-fill ${b.cls}" style="width:${p}%"></div>
+      </div>
+      <span class="stat-bar-count">${b.count} &nbsp;<span style="color:#94a3b8;">(${p}%)</span></span>
+    </div>`;
+  }).join('');
+
+  const topAspects = (stats.top_aspects || []).map(a => {
+    const name = shortAspectName(a.aspect);
+    return `<span class="stats-aspect-tag">${esc(titleCase(name))}</span>`;
+  }).join('');
+
+  return `<div class="stats-card">
+    <div class="stats-top-row">
+      <div class="stats-badge">${stats.n_reviews} reviews &nbsp;·&nbsp; ${total} aspects detected</div>
+    </div>
+    <div class="stats-bars">${bars}</div>
+    ${topAspects ? `<div class="stats-divider"></div>
+    <div class="stats-top-row2">
+      <span class="stats-top-label">Top aspects</span>
+      ${topAspects}
+    </div>` : ''}
+  </div>`;
 }
 
 // ── Aspect pill (for table) ────────────────────────────────────────────────────
 function aspectPill(r) {
   const cls = {positive:'pill-pos', negative:'pill-neg', neutral:'pill-neu'}[r.sentiment] || 'pill-neu';
-  const icon = '●';
-  let name = r.aspect || '';
-  if (name.includes(': ')) name = name.split(': ')[1];
-  return `<span class="aspect-pill ${cls}">${icon} ${esc(titleCase(name))}</span>`;
+  let name = shortAspectName(r.aspect || '');
+  return `<span class="aspect-pill ${cls}">● ${esc(titleCase(name))}</span>`;
 }
 
 // ── Table rendering ────────────────────────────────────────────────────────────
@@ -588,7 +760,7 @@ function renderTable(reviews, startNum) {
       : entry.review_text;
     const pills = entry.results
       .filter(r => r.aspect_id !== 0)
-      .map(aspectPill).join('') || '<span style="color:#94a3b8;font-size:0.75rem;">No aspects</span>';
+      .map(aspectPill).join('') || '<span style="color:#94a3b8;font-size:0.75rem;">No aspects detected</span>';
     const sourceHtml = `<div class="source-cell">
       <span class="source-name">${esc(shortCompany(entry.company || entry.domain || ''))}</span>
       <span class="source-stars">${starRating(entry.rating)}</span>
@@ -646,10 +818,9 @@ function openPanel(pageIdx, reviewNum) {
 
   document.getElementById('panel-title').textContent = `Review #${reviewNum}`;
 
-  // Source badge
   const company  = entry.company || '';
   const stars    = entry.rating  ? starRating(entry.rating) : '';
-  const domain   = entry.domain  ? titleCase(entry.domain)  : '';
+  const domain   = entry.domain  ? (DOMAIN_LABELS[entry.domain] || titleCase(entry.domain)) : '';
   const reviewer = entry.reviewer || '';
   document.getElementById('panel-source-badge').innerHTML = company
     ? `<div class="panel-source">
@@ -717,7 +888,7 @@ function buildResultsHtml(reviewText, results) {
   const annotated = annotateText(reviewText, results);
 
   const reviewSection = `
-    <p class="section-label">Review</p>
+    <p class="section-label">Review Text</p>
     <div class="review-box" id="panel-review-box">${annotated}</div>
   `;
 
@@ -733,6 +904,8 @@ function buildResultsHtml(reviewText, results) {
     const rb = document.getElementById('panel-review-box');
     if (rb) rb.className = rb.className.replace(/\\bdiffuse-\\S+/g,'').trim();
   `.replace(/\s+/g,' ');
+
+  const aspectCount = results.filter(r => r.aspect_id !== 0).length;
 
   let chips = '<div class="chip-row">';
   results.forEach(r => {
@@ -761,7 +934,7 @@ function buildResultsHtml(reviewText, results) {
 
     chips += `
       <div class="chip ${cls}" onmouseenter="${esc(jsEnter)}" onmouseleave="${esc(jsLeave)}">
-        <span class="chip-aspect">${esc(titleCase(r.aspect))}</span>
+        <span class="chip-aspect">${esc(titleCase(shortAspectName(r.aspect)))}</span>
         <span class="chip-meta">${label}${meta ? '&nbsp;&nbsp;' + meta : ''}</span>
         <div class="chip-tooltip">
           <div class="tooltip-reasoning">${reason}</div>
@@ -771,13 +944,41 @@ function buildResultsHtml(reviewText, results) {
   });
   chips += '</div>';
 
-  return reviewSection + '<p class="section-label">Detected Aspects</p>' + chips;
+  return reviewSection +
+    `<p class="section-label">Detected Aspects <span style="font-weight:400;color:#94a3b8;text-transform:none;letter-spacing:0;">(${aspectCount} found — hover to highlight evidence)</span></p>` +
+    chips;
+}
+
+// ── Context preview ────────────────────────────────────────────────────────────
+function updateContextPreview() {
+  const company  = document.getElementById('ctx-company').value.trim();
+  const industry = document.getElementById('ctx-industry').value;
+  const preview  = document.getElementById('ctx-preview');
+  if (company && industry) {
+    preview.textContent = `Context: "${company} — ${industry} industry"`;
+  } else if (company) {
+    preview.textContent = `Context: "${company}"`;
+  } else if (industry) {
+    preview.textContent = `Context: "${industry} industry"`;
+  } else {
+    preview.textContent = '';
+  }
+}
+
+function buildContextString() {
+  const company  = document.getElementById('ctx-company').value.trim();
+  const industry = document.getElementById('ctx-industry').value;
+  if (company && industry) return `${company} — ${industry} industry`;
+  if (company)  return company;
+  if (industry) return `${industry} industry`;
+  return null;
 }
 
 // ── Live analysis ──────────────────────────────────────────────────────────────
 async function runAnalysis() {
   const text    = document.getElementById('review-input').value.trim();
   const minConf = parseInt(document.getElementById('conf-slider').value) / 100;
+  const context = buildContextString();
   const btn     = document.getElementById('analyze-btn');
   const result  = document.getElementById('live-result');
 
@@ -791,11 +992,21 @@ async function runAnalysis() {
     const res  = await fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, min_confidence: minConf }),
+      body: JSON.stringify({ text, context: context || null, min_confidence: minConf }),
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || 'Server error');
-    result.innerHTML = `<div class="result-card">${buildResultsHtml(text, data.results)}</div>`;
+
+    const aspectCount = (data.results || []).filter(r => r.aspect_id !== 0).length;
+    const ctxTag = context
+      ? `<span class="result-context-tag">📍 ${esc(context)}</span>`
+      : '';
+    const headerHtml = `<div class="result-header">
+      <span class="result-title">${aspectCount} aspect${aspectCount !== 1 ? 's' : ''} detected</span>
+      ${ctxTag}
+    </div>`;
+
+    result.innerHTML = `<div class="result-card">${headerHtml}${buildResultsHtml(text, data.results)}</div>`;
   } catch (e) {
     result.innerHTML = `<div class="error-msg">Error: ${esc(e.message)}</div>`;
   } finally {
@@ -810,7 +1021,6 @@ async function loadConfig() {
     const res  = await fetch('/api/config');
     const data = await res.json();
 
-    // Sidebar: ACD name (shorten e.g. "google/gemini-3.5-flash" → "Gemini 3.5 Flash")
     const acdEl = document.getElementById('sb-acd-name');
     if (acdEl && data.llm_model) {
       const name = data.llm_model.split('/').pop()
@@ -818,19 +1028,18 @@ async function loadConfig() {
       acdEl.textContent = name;
     }
 
-    // Sidebar: ACSC metrics
     const accEl    = document.getElementById('sb-acsc-acc');
     const f1El     = document.getElementById('sb-acsc-f1');
     const epochsEl = document.getElementById('sb-acsc-epochs');
     if (accEl    && data.acsc_accuracy != null) accEl.textContent    = data.acsc_accuracy + '%';
     if (f1El     && data.acsc_macro_f1 != null) f1El.textContent     = data.acsc_macro_f1 + '%';
     if (epochsEl && data.acsc_epochs   != null) epochsEl.textContent = data.acsc_epochs;
-  } catch (_) { /* ignore — model info will stay as — */ }
+  } catch (_) {}
 }
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
 loadConfig();
-loadDomains();   // loads tabs → fetchReviews for first domain
+loadDomains();
 </script>
 </body>
 </html>

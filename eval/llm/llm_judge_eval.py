@@ -3,7 +3,7 @@ ACD evaluation of 3 LLM models on the FABSA golden test set using:
   1. Exact match metrics (set-based precision, recall, F1, exact match)
   2. Claude judge scoring (reasoning quality 0–10, over-conservatism, hallucination)
 
-For each of the 200 reviews, the model's detected aspect categories are compared
+For each of the 100 reviews, the model's detected aspect categories are compared
 against the ground truth label_codes.
 
 Run prepare_golden_test.py first if data/FABSA_golden_test_100.csv doesn't exist:
@@ -556,7 +556,7 @@ if __name__ == "__main__":
         "--n_reviews",
         type=int,
         default=0,
-        help="Limit evaluation to the first N reviews (0 = all 200, default: 0)",
+        help="Limit evaluation to the first N reviews (0 = all 100, default: 0)",
     )
     args = parser.parse_args()
     main(args)

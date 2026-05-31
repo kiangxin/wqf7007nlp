@@ -5,7 +5,7 @@ Two-stage ABSA pipeline on the [jordiclive/FABSA](https://huggingface.co/dataset
 1. **Aspect Category Detection (ACD)** — LLM via OpenRouter identifies which of 12 predefined aspect categories are mentioned in a review, with evidence spans and per-aspect reasoning.
 2. **Aspect Category Sentiment Classification (ACSC)** — Fine-tuned `yangheng/deberta-v3-base-absa-v1.1` (LoRA) predicts sentiment polarity (positive / negative / neutral) for each detected aspect.
 
-The best-performing ACD model from evaluation was `google/gemini-3.5-flash` (exact match 45 %, avg reasoning score 7.97 / 10).
+The best-performing ACD LLM model from evaluation was `google/gemini-3.5-flash` (exact match 45 %, avg reasoning score 7.97 / 10).
 
 ---
 
@@ -235,9 +235,9 @@ uvicorn app.server:app --reload --port 8501
 
 Open `http://localhost:8501`.
 
-**Browse tab** — pre-analyzed Trustpilot reviews grouped by domain (Banking, IT, E-Commerce, Fashion). Detected aspects appear as colour-coded chips (green = positive, red = negative, grey = neutral) with LLM confidence and ACSC confidence scores.
+**Browse tab** — pre-analyzed Trustpilot reviews grouped by domain (Banking, IT, E-Commerce, Fashion). A domain stats card shows sentiment breakdown (positive / negative / neutral counts) and top detected aspect categories. Individual reviews display aspect chips colour-coded by sentiment (green = positive, red = negative, grey = neutral) with LLM confidence and ACSC confidence scores.
 
-**Live Analysis tab** — paste any review text for real-time ACD + ACSC inference.
+**Live Analysis tab** — paste any review text for real-time ACD + ACSC inference. Optional context fields (company name, industry) prepend business context to the LLM prompt for more accurate aspect detection.
 
 ---
 
