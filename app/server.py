@@ -22,8 +22,8 @@ from pydantic import BaseModel
 ROOT         = Path(__file__).parent   # → app/
 PROJECT_ROOT = ROOT.parent             # → absa_nlp/
 
-sys.path.insert(0, str(PROJECT_ROOT / "ml_dev"))  # inference.py
-sys.path.insert(0, str(PROJECT_ROOT / "utils"))   # json_parser.py
+sys.path.insert(0, str(PROJECT_ROOT / "dev"))    # inference.py
+sys.path.insert(0, str(PROJECT_ROOT / "utils"))  # json_parser.py
 
 # Load .env from project root
 load_dotenv(PROJECT_ROOT / ".env")
@@ -31,10 +31,10 @@ load_dotenv(PROJECT_ROOT / ".env")
 # ── Constants ─────────────────────────────────────────────────────────────────
 PREDICTIONS_DIR  = ROOT / "data" / "output"
 BASE_MODEL       = "yangheng/deberta-v3-base-absa-v1.1"
-ADAPTER_DIR      = str(PROJECT_ROOT / "ml_dev" / "model" / "deberta_absa_finetuned_v3")
+ADAPTER_DIR      = str(PROJECT_ROOT / "dev" / "model" / "deberta_absa_finetuned")
 CHECKPOINT_INFO  = (
-    PROJECT_ROOT / "ml_dev" / "model"
-    / "deberta_absa_finetuned_v3" / "checkpoint-4270" / "checkpoint_info.json"
+    PROJECT_ROOT / "dev" / "model"
+    / "deberta_absa_finetuned" / "checkpoint-4190" / "checkpoint_info.json"
 )
 PAGE_SIZE        = 20
 FRONTEND_HTML    = ROOT / "frontend" / "index.html"
@@ -152,6 +152,32 @@ def get_reviews(page: int = 1, per_page: int = PAGE_SIZE, domain: str = "banking
     }
 
 
+@app.get("/api/stats")
+def get_stats(domain: str = "banking"):
+    """Return sentiment breakdown and top aspects for a domain."""
+    payload = _load_domain(domain)
+    reviews = payload["reviews"]
+    sentiment_counts: dict[str, int] = {"positive": 0, "negative": 0, "neutral": 0}
+    aspect_counts: dict[str, int] = {}
+    for review in reviews:
+        for r in review.get("results", []):
+            if r.get("aspect_id") == 0:
+                continue
+            sent = r.get("sentiment", "neutral")
+            sentiment_counts[sent] = sentiment_counts.get(sent, 0) + 1
+            aspect = r.get("aspect", "")
+            if aspect:
+                aspect_counts[aspect] = aspect_counts.get(aspect, 0) + 1
+    top_aspects = sorted(aspect_counts.items(), key=lambda x: -x[1])[:6]
+    return {
+        "domain":           payload.get("domain", domain),
+        "n_reviews":        len(reviews),
+        "total_aspects":    sum(sentiment_counts.values()),
+        "sentiment_counts": sentiment_counts,
+        "top_aspects":      [{"aspect": a, "count": c} for a, c in top_aspects],
+    }
+
+
 @app.get("/api/review/{num}")
 def get_review(num: int, domain: str = "banking"):
     payload = _load_domain(domain)
@@ -163,6 +189,7 @@ def get_review(num: int, domain: str = "banking"):
 
 class AnalyzeRequest(BaseModel):
     text:           str
+    context:        str | None = None
     min_confidence: float = 0.70
 
 
@@ -188,6 +215,7 @@ def analyze(req: AnalyzeRequest):
         stats=RunStats(),
         cache=LLMCache(None),
         min_confidence=req.min_confidence,
+        context=req.context or None,
     )
     clean = [{k: v for k, v in r.items() if k != "_llm_raw"} for r in results]
     return {"results": clean, "model": llm_model}

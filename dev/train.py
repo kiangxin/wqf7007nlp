@@ -50,7 +50,7 @@ _HERE = Path(__file__).parent  # → ml_dev/
 MODEL_NAME  = "yangheng/deberta-v3-base-absa-v1.1"
 DATA_PATH   = str(_HERE / "data" / "FABSA_train_preprocessed.csv")
 VAL_PATH    = str(_HERE / "data" / "FABSA_val_preprocessed.csv")   # official FABSA validation split
-OUTPUT_DIR  = str(_HERE / "model" / "deberta_absa_finetuned")
+OUTPUT_DIR  = str(_HERE / "model" / "deberta_absa_finetuned_v2")
 MAX_LENGTH  = 256   # covers ~93 % of FABSA pairs; MPS-safe. Raise to 256/512 on GPU
 BATCH_SIZE  = 2     # small physical batch for MPS; grad accumulation keeps effective=16
 GRAD_ACCUM  = 8     # effective batch = BATCH_SIZE * GRAD_ACCUM = 16
