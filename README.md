@@ -271,6 +271,6 @@ Key options:
 Example output:
 
 ```
-  [ 6] online experience: app or website         LLM:98%  → positive   ABSA:95.66%
+  [ 6] online experience: app or website         LLM:98%  → positive   ABSA:95.67%
   [ 5] logistics: speed                           LLM:95%  → negative   ABSA:91.20%
 ```
