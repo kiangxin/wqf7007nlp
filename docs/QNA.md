@@ -1,8 +1,3 @@
-# Project Challenges, Solutions & Defence
-## Q&A Format — Dataset · Architecture · Implementation · Evaluation
-
----
-
 ## PART 1 — Dataset Problems & What We Did
 
 ### Q1: What data quality issues did we find in FABSA, and how did we address them?
