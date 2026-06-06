@@ -66,10 +66,51 @@ wqf7007nlp/
 
 ## Setup
 
+We recommend using **Python 3.11** for this project. You can set up your environment using either **Conda** or a standard **Python virtual environment (venv)**.
+
+### Option A: Setup with Conda (Recommended)
+
+If you use Anaconda or Miniconda, run the following commands from the project root:
+
 ```bash
+# 1. Create a conda environment with Python 3.11
+conda create -n <your-env-name> python=3.11 -y
+
+# 2. Activate the environment
+conda activate <your-env-name>
+
+# 3. Install packages
 pip install -r requirements.txt
-playwright install chromium   # only needed if re-running the scraper
+
+# 4. Install Playwright browser dependencies (only needed if re-running the scraper)
+playwright install chromium
 ```
+
+### Option B: Setup with Python `venv`
+
+If you prefer using the built-in python `venv` module, run the following commands:
+
+```bash
+# 1. Create a virtual environment (e.g., named 'venv') using Python 3.11
+python3.11 -m venv venv
+
+# 2. Activate the virtual environment
+# On macOS/Linux:
+source venv/bin/activate
+# On Windows (Command Prompt):
+venv\Scripts\activate.bat
+# On Windows (PowerShell):
+.\venv\Scripts\Activate.ps1
+
+# 3. Upgrade pip and install packages
+pip install --upgrade pip
+pip install -r requirements.txt
+
+# 4. Install Playwright browser dependencies (only needed if re-running the scraper)
+playwright install chromium
+```
+
+---
 
 Create a `.env` file at the project root:
 

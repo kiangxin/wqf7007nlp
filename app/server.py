@@ -2,7 +2,7 @@
 FastAPI backend for the ABSA Analyzer.
 
 Run (from project root):
-  conda activate py311
+  # Activate your virtual environment (e.g., conda activate <env-name> or source venv/bin/activate)
   uvicorn app.server:app --reload --port 8501
 
 Then open: http://localhost:8501
