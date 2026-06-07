@@ -32,10 +32,12 @@ load_dotenv(PROJECT_ROOT / ".env")
 PREDICTIONS_DIR  = ROOT / "data" / "output"
 BASE_MODEL       = "yangheng/deberta-v3-base-absa-v1.1"
 ADAPTER_DIR      = str(PROJECT_ROOT / "dev" / "model" / "deberta_absa_finetuned")
-CHECKPOINT_INFO  = (
-    PROJECT_ROOT / "dev" / "model"
-    / "deberta_absa_finetuned" / "checkpoint-4190" / "checkpoint_info.json"
-)
+CHECKPOINT_INFO  = PROJECT_ROOT / "dev" / "model" / "deberta_absa_finetuned" / "checkpoint_info.json"
+if not CHECKPOINT_INFO.exists():
+    CHECKPOINT_INFO = (
+        PROJECT_ROOT / "dev" / "model"
+        / "deberta_absa_finetuned" / "checkpoint-4190" / "checkpoint_info.json"
+    )
 PAGE_SIZE        = 20
 FRONTEND_HTML    = ROOT / "frontend" / "index.html"
 

@@ -36,6 +36,11 @@ ENV/
 
 # Keep only the final fine-tuned adapter, not intermediate checkpoints
 !dev/model/deberta_absa_finetuned/adapter_model.safetensors
+!dev/model/deberta_absa_finetuned/adapter_config.json
+!dev/model/deberta_absa_finetuned/tokenizer.json
+!dev/model/deberta_absa_finetuned/tokenizer_config.json
+!dev/model/deberta_absa_finetuned/training_args.bin
+!dev/model/deberta_absa_finetuned/checkpoint_info.json
 checkpoint-*/
 
 # Logs & output
