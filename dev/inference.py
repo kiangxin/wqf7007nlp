@@ -614,37 +614,89 @@ def run_pipeline(
         )
         reasoning = asp.get("reasoning", "")
 
-        # Build text for DeBERTa:
-        #   verbatim → expand each span to its enclosing sentence, join
-        #   diffuse  → use the full cleaned review
-        if evidence_spans:
-            expanded = [expand_to_sentence(text, span, stats) for span in evidence_spans]
-            seen = set()
-            deduped = [s for s in expanded if not (s in seen or seen.add(s))]
-            evidence_text = clean_text(" ".join(deduped))
-        else:
-            stats.diffuse_spans += 1
-            evidence_text = clean  # diffuse: no span, use full review
-
         aspect_readable = ASPECTS[idx]
-        sentiment = predict_sentiment(
-            absa_model, tokenizer, evidence_text, aspect_readable, device, max_length
-        )
 
-        results.append({
-            "aspect_id":       idx,
-            "aspect":          aspect_readable,
-            "category":        ASPECT_SLUGS[idx],
-            "reasoning":       reasoning,
-            "evidence_spans":  evidence_spans,
-            "evidence_type":   evidence_type,
-            "evidence_text":   evidence_text,
-            "llm_confidence":  round(llm_conf, 4),
-            "sentiment":       sentiment["sentiment"],
-            "absa_confidence": sentiment["confidence"],
-            "scores":          sentiment["scores"],
-            "_llm_raw":        llm_output,
-        })
+        # ── Per-span classification ──────────────────────────────────────
+        # Classify each evidence span individually through DeBERTa, then
+        # group by predicted sentiment.  This ensures mixed-polarity
+        # aspects (e.g. "fast delivery" + "slow second order") produce
+        # separate result entries instead of averaging into one.
+        if evidence_spans:
+            span_classifications = []
+            for span in evidence_spans:
+                expanded = expand_to_sentence(text, span, stats)
+                span_text = clean_text(expanded)
+                span_sent = predict_sentiment(
+                    absa_model, tokenizer, span_text, aspect_readable,
+                    device, max_length,
+                )
+                span_classifications.append({
+                    "span":            span,
+                    "absa_sentiment":  span_sent["sentiment"],
+                    "absa_confidence": span_sent["confidence"],
+                    "absa_scores":     span_sent["scores"],
+                })
+
+            # Group spans by their predicted sentiment
+            groups: dict[str, list[dict]] = {}
+            for sc in span_classifications:
+                groups.setdefault(sc["absa_sentiment"], []).append(sc)
+
+            for sent_label, group_spans in groups.items():
+                avg_conf = round(
+                    sum(s["absa_confidence"] for s in group_spans)
+                    / len(group_spans), 4
+                )
+                avg_scores: dict[str, float] = {}
+                for lbl in ("positive", "negative", "neutral"):
+                    avg_scores[lbl] = round(
+                        sum(s["absa_scores"].get(lbl, 0) for s in group_spans)
+                        / len(group_spans), 4
+                    )
+                results.append({
+                    "aspect_id":       idx,
+                    "aspect":          aspect_readable,
+                    "category":        ASPECT_SLUGS[idx],
+                    "reasoning":       reasoning,
+                    "evidence_spans":  [s["span"] for s in group_spans],
+                    "evidence_type":   evidence_type,
+                    "llm_confidence":  round(llm_conf, 4),
+                    "sentiment":       sent_label,
+                    "absa_confidence": avg_conf,
+                    "scores":          avg_scores,
+                    "span_details":    [
+                        {
+                            "span":            s["span"],
+                            "llm_confidence":  round(llm_conf, 4),
+                            "absa_sentiment":  s["absa_sentiment"],
+                            "absa_confidence": s["absa_confidence"],
+                            "absa_scores":     s["absa_scores"],
+                        }
+                        for s in group_spans
+                    ],
+                    "_llm_raw":        llm_output,
+                })
+        else:
+            # Diffuse: no extractable span — classify the full review
+            stats.diffuse_spans += 1
+            sentiment = predict_sentiment(
+                absa_model, tokenizer, clean, aspect_readable,
+                device, max_length,
+            )
+            results.append({
+                "aspect_id":       idx,
+                "aspect":          aspect_readable,
+                "category":        ASPECT_SLUGS[idx],
+                "reasoning":       reasoning,
+                "evidence_spans":  [],
+                "evidence_type":   evidence_type,
+                "llm_confidence":  round(llm_conf, 4),
+                "sentiment":       sentiment["sentiment"],
+                "absa_confidence": sentiment["confidence"],
+                "scores":          sentiment["scores"],
+                "span_details":    [],
+                "_llm_raw":        llm_output,
+            })
 
     if not results:
         return [{

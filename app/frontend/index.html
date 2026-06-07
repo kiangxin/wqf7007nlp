@@ -307,6 +307,15 @@ tbody td.col-num {
 .tooltip-reasoning { color: #94a3b8; margin-bottom: 6px; }
 .tooltip-evidence  { color: #f8fafc; font-style: italic; }
 
+.tooltip-span-detail { margin-top: 8px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.1); }
+.tooltip-span-detail:first-of-type { margin-top: 4px; border-top: none; padding-top: 0; }
+.tooltip-span-text { color: #f8fafc; font-style: italic; margin-bottom: 3px; }
+.tooltip-span-scores { font-size: 0.7rem; color: #94a3b8; }
+.tt-score-positive { color: #86efac; }
+.tt-score-negative { color: #fca5a5; }
+.tt-score-neutral  { color: #cbd5e1; }
+.tt-score-llm      { color: #a5b4fc; }
+
 .no-result { color: #94a3b8; font-size: 0.88rem; font-style: italic; margin-top: 0.5rem; }
 
 /* ── Loading state ─────────────────────────────────────────────────────────── */
@@ -419,6 +428,112 @@ tbody td.col-num {
 }
 
 .conf-slider { width: 100%; accent-color: #6366f1; }
+
+/* ── Dataset Insights page ─────────────────────────────────────────────────── */
+.metric-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px; margin: 1.25rem 0;
+}
+.metric-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; padding: 1.25rem 1.35rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  display: flex; flex-direction: column; gap: 4px;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.metric-card:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(0,0,0,0.08); }
+.metric-value {
+  font-size: 1.75rem; font-weight: 700; color: #0f172a;
+  letter-spacing: -0.03em; line-height: 1.2;
+}
+.metric-label {
+  font-size: 0.74rem; font-weight: 600; color: #64748b;
+  text-transform: uppercase; letter-spacing: 0.08em;
+}
+.metric-icon {
+  font-size: 1.3rem; margin-bottom: 2px;
+}
+
+/* ── Dataset table ─────────────────────────────────────────────────────────── */
+.ds-table-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  margin-bottom: 1.5rem;
+}
+.ds-table { width: 100%; border-collapse: collapse; }
+.ds-table thead tr { background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+.ds-table thead th {
+  padding: 11px 16px; text-align: left;
+  font-size: 0.66rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase; color: #94a3b8;
+}
+.ds-table tbody tr { border-bottom: 1px solid #f1f5f9; transition: background 0.12s; }
+.ds-table tbody tr:last-child { border-bottom: none; }
+.ds-table tbody tr:hover { background: #f0f9ff; }
+.ds-table tbody td { padding: 12px 16px; font-size: 0.85rem; color: #1e293b; vertical-align: middle; }
+
+.ds-domain-badge {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-weight: 600; color: #0f172a;
+}
+.ds-domain-icon {
+  width: 28px; height: 28px; border-radius: 8px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; flex-shrink: 0;
+}
+.ds-domain-icon.banking   { background: #dbeafe; }
+.ds-domain-icon.ecommerce { background: #fce7f3; }
+.ds-domain-icon.fashion   { background: #ede9fe; }
+.ds-domain-icon.it        { background: #d1fae5; }
+
+.ds-company-tag {
+  display: inline-block; padding: 2px 10px; border-radius: 99px;
+  background: #f1f5f9; border: 1px solid #e2e8f0;
+  font-size: 0.75rem; color: #475569; margin: 1px 3px 1px 0;
+}
+
+/* ── Aspect catalog ────────────────────────────────────────────────────────── */
+.catalog-group-label {
+  font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; color: #94a3b8;
+  padding: 10px 16px 4px; background: #f8fafc;
+}
+.catalog-slug {
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 0.72rem; color: #6366f1; background: #eef2ff;
+  padding: 2px 8px; border-radius: 6px;
+}
+.catalog-desc {
+  font-size: 0.78rem; color: #64748b; line-height: 1.5;
+}
+.catalog-id {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 24px; height: 24px; border-radius: 6px;
+  background: #f1f5f9; border: 1px solid #e2e8f0;
+  font-size: 0.72rem; font-weight: 700; color: #475569;
+}
+
+/* ── Sentiment mini-bars (dataset page) ────────────────────────────────────── */
+.ds-sent-bar {
+  display: flex; height: 6px; border-radius: 99px; overflow: hidden;
+  background: #f1f5f9; min-width: 100px;
+}
+.ds-sent-bar .bar-seg-pos { background: #4ade80; }
+.ds-sent-bar .bar-seg-neg { background: #f87171; }
+.ds-sent-bar .bar-seg-neu { background: #94a3b8; }
+.ds-sent-legend {
+  display: flex; gap: 10px; margin-top: 4px;
+  font-size: 0.68rem; color: #64748b;
+}
+.ds-sent-legend .dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; margin-right: 3px; vertical-align: middle; }
+.ds-sent-legend .dot-pos { background: #4ade80; }
+.ds-sent-legend .dot-neg { background: #f87171; }
+.ds-sent-legend .dot-neu { background: #94a3b8; }
+
+.ds-source-label {
+  font-size: 0.68rem; color: #94a3b8; margin-top: 1px;
+}
 </style>
 </head>
 <body>
@@ -434,6 +549,9 @@ tbody td.col-num {
     <nav class="sb-nav">
       <div class="nav-item active" data-view="browse" onclick="switchView('browse', this)">
         <span class="nav-icon">📋</span> Review Explorer
+      </div>
+      <div class="nav-item" data-view="dataset" onclick="switchView('dataset', this); loadDatasetInsights()">
+        <span class="nav-icon">📊</span> Dataset Insights
       </div>
       <div class="nav-item" data-view="live" onclick="switchView('live', this)">
         <span class="nav-icon">✦</span> Analyze Review
@@ -568,6 +686,48 @@ tbody td.col-num {
         </div>
 
         <div id="live-result"></div>
+      </div>
+    </div>
+
+    <!-- ── Dataset Insights view ──────────────────────────────────────── -->
+    <div id="view-dataset" class="view">
+      <h1 class="page-title">Dataset Insights</h1>
+      <p class="page-sub">Overview of loaded datasets, source companies, and the 12 predefined aspect categories used by the pipeline.</p>
+
+      <!-- Summary metrics -->
+      <div class="metric-grid" id="ds-metrics">
+        <div class="metric-card"><div class="metric-icon">⏳</div><div class="metric-value skeleton short" style="height:28px;width:60px;"></div><div class="metric-label">Loading…</div></div>
+      </div>
+
+      <!-- Domains & Sources table -->
+      <p class="section-label">Loaded Datasets &amp; Sources</p>
+      <div class="ds-table-card">
+        <table class="ds-table">
+          <thead><tr>
+            <th>Domain</th>
+            <th>Source Company</th>
+            <th>Reviews</th>
+            <th>Aspects Detected</th>
+            <th>Sentiment Breakdown</th>
+          </tr></thead>
+          <tbody id="ds-domains-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:2rem;color:#94a3b8;">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Aspect Taxonomy Catalog -->
+      <p class="section-label">Aspect Category Taxonomy</p>
+      <div class="ds-table-card">
+        <table class="ds-table" id="ds-catalog-table">
+          <thead><tr>
+            <th style="width:36px;">ID</th>
+            <th>Category</th>
+            <th>Slug</th>
+            <th>Description</th>
+          </tr></thead>
+          <tbody id="ds-catalog-tbody"></tbody>
+        </table>
       </div>
     </div>
 
@@ -913,9 +1073,7 @@ function buildResultsHtml(reviewText, results) {
     const sent  = r.sentiment;
     const cls   = CLS[sent] || 'chip-neu';
     const label = LABEL[sent] || sent;
-    const llm   = r.llm_confidence  != null ? `LLM ${Math.round(r.llm_confidence*100)}%`    : '';
-    const absa  = r.absa_confidence != null ? `ABSA ${(r.absa_confidence*100).toFixed(1)}%`  : '';
-    const meta  = [llm, absa].filter(Boolean).join(' · ');
+
     const reason = esc(r.reasoning || '');
     const spans  = r.evidence_spans || [];
     const isDiff = r.evidence_type === 'diffuse' || !spans.length;
@@ -928,18 +1086,35 @@ function buildResultsHtml(reviewText, results) {
       jsEnter = `(function(){var id='${aid}';document.querySelectorAll('#detail-panel .hl-span').forEach(function(e){var m=e.dataset.aspectId===String(id);e.classList.toggle('hl-active',m);e.classList.toggle('hl-dimmed',!m);});})();`;
     }
 
-    const evHtml = isDiff
-      ? '<em>Whole-review sentiment</em>'
-      : (spans.map(s => `&ldquo;${esc(s)}&rdquo;`).join(' &nbsp;·&nbsp; ') || '<em>No specific span</em>');
+    // Build tooltip — show per-span ABSA scores if available
+    const spanDetails = r.span_details || [];
+    let tooltipBody;
+    if (spanDetails.length > 0) {
+      const llmConf = r.llm_confidence != null ? Math.round(r.llm_confidence*100) + '%' : '';
+      tooltipBody = spanDetails.map(sd => {
+          const scores = sd.absa_scores || {};
+          const llmTag = llmConf ? `<span class="tt-score-llm">LLM ${llmConf}</span>  ·  ` : '';
+          const absaStr = ['positive','negative','neutral']
+            .map(k => `<span class="tt-score-${k}">${k.charAt(0).toUpperCase()+k.slice(1)} ${((scores[k]||0)*100).toFixed(1)}%</span>`)
+            .join('  ·  ');
+          return `<div class="tooltip-span-detail">
+            <div class="tooltip-span-text">&ldquo;${esc(sd.span)}&rdquo;</div>
+            <div class="tooltip-span-scores">${llmTag}${absaStr}</div>
+          </div>`;
+        }).join('');
+    } else if (isDiff) {
+      tooltipBody = `<div class="tooltip-evidence"><em>Whole-review sentiment</em></div>`;
+    } else {
+      // Fallback for legacy data without span_details
+      const evHtml = spans.map(s => `&ldquo;${esc(s)}&rdquo;`).join(' &nbsp;·&nbsp; ') || '<em>No specific span</em>';
+      tooltipBody = `<div class="tooltip-evidence">${evHtml}</div>`;
+    }
 
     chips += `
       <div class="chip ${cls}" onmouseenter="${esc(jsEnter)}" onmouseleave="${esc(jsLeave)}">
         <span class="chip-aspect">${esc(titleCase(shortAspectName(r.aspect)))}</span>
-        <span class="chip-meta">${label}${meta ? '&nbsp;&nbsp;' + meta : ''}</span>
-        <div class="chip-tooltip">
-          <div class="tooltip-reasoning">${reason}</div>
-          <div class="tooltip-evidence">${evHtml}</div>
-        </div>
+        <span class="chip-meta">${label}</span>
+        <div class="chip-tooltip">${tooltipBody}</div>
       </div>`;
   });
   chips += '</div>';
@@ -1035,6 +1210,158 @@ async function loadConfig() {
     if (f1El     && data.acsc_macro_f1 != null) f1El.textContent     = data.acsc_macro_f1 + '%';
     if (epochsEl && data.acsc_epochs   != null) epochsEl.textContent = data.acsc_epochs;
   } catch (_) {}
+}
+
+// ── Dataset Insights page ──────────────────────────────────────────────────────
+const ASPECT_CATALOG = [
+  { id:1,  name:'Account Management: Account Access',       slug:'account-management.account-access',          desc:'Issues with logging in, locked accounts, password resets, or accessing account features.' },
+  { id:2,  name:'Company Brand: Competitor',                slug:'company-brand.competitor',                    desc:'References to competing brands or services, comparisons with other companies.' },
+  { id:3,  name:'Company Brand: General Satisfaction',      slug:'company-brand.general-satisfaction',           desc:'Overall satisfaction or dissatisfaction with the brand as a whole.' },
+  { id:4,  name:'Company Brand: Reviews',                   slug:'company-brand.reviews',                       desc:'Mentions of other reviews, ratings, or reputation-related comments.' },
+  { id:5,  name:'Logistics: Speed',                         slug:'logistics-rides.speed',                        desc:'Delivery or shipping speed — how fast (or slow) items arrived.' },
+  { id:6,  name:'Online Experience: App or Website',        slug:'online-experience.app-website',                desc:'Usability, bugs, or design quality of the company\'s app or website.' },
+  { id:7,  name:'Purchase/Booking Experience: Ease of Use', slug:'purchase-booking-experience.ease-of-use',      desc:'How easy or difficult the purchasing, booking, or sign-up process was.' },
+  { id:8,  name:'Staff Support: Attitude of Staff',         slug:'staff-support.attitude-of-staff',              desc:'Helpfulness, friendliness, professionalism, or rudeness of staff members.' },
+  { id:9,  name:'Staff Support: Email',                     slug:'staff-support.email',                          desc:'Quality and responsiveness of email-based customer support.' },
+  { id:10, name:'Staff Support: Phone',                     slug:'staff-support.phone',                          desc:'Quality of phone-based support — hold times, call resolution, agent behaviour.' },
+  { id:11, name:'Value: Discounts and Promotions',          slug:'value.discounts-promotions',                   desc:'Mentions of coupons, discount codes, promotional offers, or deals.' },
+  { id:12, name:'Value: Price / Value for Money',           slug:'value.price-value-for-money',                  desc:'Whether the product or service is considered worth its price.' },
+];
+
+const DOMAIN_ICONS = { banking:'🏦', ecommerce:'🛒', fashion:'👗', it:'💻' };
+
+let _datasetLoaded = false;
+
+async function loadDatasetInsights() {
+  if (_datasetLoaded) return;
+  _datasetLoaded = true;
+
+  try {
+    // 1. Fetch domain list
+    const domRes  = await fetch('/api/domains');
+    const domData = await domRes.json();
+    const domains = domData.domains || [];
+
+    // 2. Fetch stats for each domain in parallel
+    const statsArr = await Promise.all(
+      domains.map(d => fetch(`/api/stats?domain=${encodeURIComponent(d.domain)}`).then(r => r.json()))
+    );
+
+    // 3. Fetch first page of reviews per domain to get unique company names
+    const reviewsArr = await Promise.all(
+      domains.map(d => fetch(`/api/reviews?page=1&per_page=50&domain=${encodeURIComponent(d.domain)}`).then(r => r.json()))
+    );
+
+    // Aggregate totals
+    let totalReviews = 0, totalAspects = 0, totalPos = 0, totalNeg = 0, totalNeu = 0;
+    statsArr.forEach(s => {
+      totalReviews += s.n_reviews || 0;
+      const sc = s.sentiment_counts || {};
+      totalPos += sc.positive || 0;
+      totalNeg += sc.negative || 0;
+      totalNeu += sc.neutral  || 0;
+    });
+    totalAspects = totalPos + totalNeg + totalNeu;
+
+    // Render metric cards
+    document.getElementById('ds-metrics').innerHTML = `
+      <div class="metric-card">
+        <div class="metric-icon">🗂️</div>
+        <div class="metric-value">${domains.length}</div>
+        <div class="metric-label">Domains</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">💬</div>
+        <div class="metric-value">${totalReviews}</div>
+        <div class="metric-label">Total Reviews</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">🏷️</div>
+        <div class="metric-value">${totalAspects}</div>
+        <div class="metric-label">Aspects Detected</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">📐</div>
+        <div class="metric-value">12</div>
+        <div class="metric-label">Aspect Categories</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">✅</div>
+        <div class="metric-value" style="color:#16a34a;">${totalPos}</div>
+        <div class="metric-label">Positive</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon">❌</div>
+        <div class="metric-value" style="color:#dc2626;">${totalNeg}</div>
+        <div class="metric-label">Negative</div>
+      </div>
+    `;
+
+    // Render domains table
+    const tbody = document.getElementById('ds-domains-tbody');
+    tbody.innerHTML = domains.map((d, i) => {
+      const s = statsArr[i];
+      const sc = s.sentiment_counts || {};
+      const pos = sc.positive || 0, neg = sc.negative || 0, neu = sc.neutral || 0;
+      const tot = pos + neg + neu || 1;
+      const pctPos = Math.round(pos/tot*100), pctNeg = Math.round(neg/tot*100), pctNeu = 100 - pctPos - pctNeg;
+
+      // Unique companies from reviews
+      const reviews = (reviewsArr[i] && reviewsArr[i].reviews) || [];
+      const companies = [...new Set(reviews.map(r => r.company).filter(Boolean))];
+      const companyTags = companies.length
+        ? companies.map(c => `<span class="ds-company-tag">${esc(c)}</span>`).join('')
+        : '<span style="color:#94a3b8;font-size:0.78rem;">—</span>';
+
+      const domainLabel = DOMAIN_LABELS[d.domain] || titleCase(d.domain);
+      const icon = DOMAIN_ICONS[d.domain] || '📁';
+
+      return `<tr>
+        <td>
+          <div class="ds-domain-badge">
+            <span class="ds-domain-icon ${d.domain}">${icon}</span>
+            ${esc(domainLabel)}
+          </div>
+          <div class="ds-source-label">Trustpilot</div>
+        </td>
+        <td>${companyTags}</td>
+        <td style="font-weight:600;">${d.n_reviews}</td>
+        <td style="font-weight:600;">${s.total_aspects || tot}</td>
+        <td>
+          <div class="ds-sent-bar">
+            <div class="bar-seg-pos" style="width:${pctPos}%"></div>
+            <div class="bar-seg-neg" style="width:${pctNeg}%"></div>
+            <div class="bar-seg-neu" style="width:${pctNeu}%"></div>
+          </div>
+          <div class="ds-sent-legend">
+            <span><span class="dot dot-pos"></span>${pos}</span>
+            <span><span class="dot dot-neg"></span>${neg}</span>
+            <span><span class="dot dot-neu"></span>${neu}</span>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+
+  } catch (e) {
+    document.getElementById('ds-metrics').innerHTML =
+      `<div class="metric-card" style="grid-column:1/-1;"><div style="color:#dc2626;">Failed to load: ${esc(e.message)}</div></div>`;
+  }
+
+  // Render aspect catalog (static)
+  const catBody = document.getElementById('ds-catalog-tbody');
+  catBody.innerHTML = ASPECT_CATALOG.map(a => {
+    const group = a.name.split(':')[0].trim();
+    const sub   = a.name.includes(':') ? a.name.split(':').slice(1).join(':').trim() : a.name;
+    return `<tr>
+      <td><span class="catalog-id">${a.id}</span></td>
+      <td>
+        <div style="font-weight:600;color:#0f172a;font-size:0.84rem;">${esc(sub)}</div>
+        <div style="font-size:0.68rem;color:#94a3b8;margin-top:1px;">${esc(group)}</div>
+      </td>
+      <td><span class="catalog-slug">${esc(a.slug)}</span></td>
+      <td><span class="catalog-desc">${esc(a.desc)}</span></td>
+    </tr>`;
+  }).join('');
 }
 
 // ── Boot ───────────────────────────────────────────────────────────────────────
