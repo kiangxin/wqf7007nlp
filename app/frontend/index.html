@@ -534,6 +534,104 @@ tbody td.col-num {
 .ds-source-label {
   font-size: 0.68rem; color: #94a3b8; margin-top: 1px;
 }
+
+/* ── Model Performance page ────────────────────────────────────── */
+.perf-delta-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: 14px; margin: 1.25rem 0;
+}
+.perf-delta-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; padding: 1.25rem 1.35rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  text-align: center;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.perf-delta-card:hover { transform: translateY(-2px); box-shadow: 0 5px 16px rgba(0,0,0,0.08); }
+.perf-delta-label {
+  font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 0.1em; text-transform: uppercase;
+  color: #94a3b8; margin-bottom: 0.4rem;
+}
+.perf-delta-values {
+  display: flex; justify-content: center; align-items: baseline; gap: 12px;
+  margin-bottom: 0.35rem;
+}
+.perf-val-base { font-size: 1.1rem; font-weight: 600; color: #94a3b8; }
+.perf-val-arrow { font-size: 0.9rem; color: #cbd5e1; }
+.perf-val-tuned { font-size: 1.5rem; font-weight: 700; color: #0f172a; letter-spacing: -0.02em; }
+.perf-delta-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 99px;
+  font-size: 0.75rem; font-weight: 700;
+  background: #f0fdf4; border: 1px solid #86efac; color: #16a34a;
+}
+.perf-model-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 14px; margin: 0.5rem 0 1.25rem;
+}
+.perf-model-card {
+  background: #fff; border: 1.5px solid #e2e8f0;
+  border-radius: 14px; padding: 1rem 1.25rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.perf-model-card.perf-highlight {
+  border-color: #a5b4fc;
+  background: linear-gradient(135deg, #fafbff 0%, #eef0ff 100%);
+  box-shadow: 0 2px 12px rgba(99,102,241,0.1);
+}
+.perf-model-badge {
+  font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: #94a3b8; margin-bottom: 0.35rem;
+}
+.perf-model-name {
+  font-size: 0.85rem; font-weight: 600; color: #0f172a;
+  margin-bottom: 0.25rem; word-break: break-all;
+}
+.perf-model-desc {
+  font-size: 0.76rem; color: #64748b; line-height: 1.5;
+}
+.perf-bars-card {
+  background: #fff; border: 1px solid #e2e8f0;
+  border-radius: 16px; padding: 1rem 1.5rem 0.75rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  margin-bottom: 1.25rem;
+}
+.perf-class-row {
+  display: grid; grid-template-columns: 80px 1fr 50px 1fr 50px;
+  align-items: center; gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+.perf-class-row:last-child { border-bottom: none; }
+.perf-class-label { font-size: 0.82rem; font-weight: 600; color: #0f172a; }
+.perf-bar-track {
+  height: 10px; background: #f1f5f9;
+  border-radius: 99px; overflow: hidden;
+}
+.perf-bar-fill {
+  height: 100%; border-radius: 99px;
+  transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+}
+.perf-bar-fill.bar-base { background: #cbd5e1; }
+.perf-bar-fill.bar-tuned { background: #6366f1; }
+.perf-bar-val {
+  font-size: 0.78rem; font-weight: 600; text-align: right;
+}
+.perf-bar-val.val-base { color: #94a3b8; }
+.perf-bar-val.val-tuned { color: #6366f1; }
+.perf-legend {
+  display: flex; align-items: center; gap: 18px;
+  margin: 0.5rem 0 0.5rem;
+  font-size: 0.74rem; color: #64748b;
+}
+.perf-legend-dot {
+  display: inline-block; width: 10px; height: 10px;
+  border-radius: 3px; margin-right: 5px; vertical-align: middle;
+}
+.perf-legend-dot.dot-base { background: #cbd5e1; }
+.perf-legend-dot.dot-tuned { background: #6366f1; }
 </style>
 </head>
 <body>
@@ -547,11 +645,14 @@ tbody td.col-num {
     </div>
 
     <nav class="sb-nav">
-      <div class="nav-item active" data-view="browse" onclick="switchView('browse', this)">
-        <span class="nav-icon">📋</span> Review Explorer
-      </div>
-      <div class="nav-item" data-view="dataset" onclick="switchView('dataset', this); loadDatasetInsights()">
+      <div class="nav-item active" data-view="dataset" onclick="switchView('dataset', this); loadDatasetInsights()">
         <span class="nav-icon">📊</span> Dataset Insights
+      </div>
+      <div class="nav-item" data-view="perf" onclick="switchView('perf', this)">
+        <span class="nav-icon">📈</span> Model Performance
+      </div>
+      <div class="nav-item" data-view="browse" onclick="switchView('browse', this)">
+        <span class="nav-icon">📋</span> Review Explorer
       </div>
       <div class="nav-item" data-view="live" onclick="switchView('live', this)">
         <span class="nav-icon">✦</span> Analyze Review
@@ -588,7 +689,7 @@ tbody td.col-num {
   <main class="main">
 
     <!-- ── Browse view ─────────────────────────────────────────────────── -->
-    <div id="view-browse" class="view active">
+    <div id="view-browse" class="view">
       <h1 class="page-title">Review Explorer</h1>
       <p class="page-sub">Pre-analyzed Trustpilot customer reviews across 4 industries.
         Click any row to see the full aspect breakdown with evidence highlights.</p>
@@ -690,28 +791,79 @@ tbody td.col-num {
     </div>
 
     <!-- ── Dataset Insights view ──────────────────────────────────────── -->
-    <div id="view-dataset" class="view">
+    <div id="view-dataset" class="view active">
       <h1 class="page-title">Dataset Insights</h1>
       <p class="page-sub">Overview of loaded datasets, source companies, and the 12 predefined aspect categories used by the pipeline.</p>
 
       <!-- Summary metrics -->
       <div class="metric-grid" id="ds-metrics">
-        <div class="metric-card"><div class="metric-icon">⏳</div><div class="metric-value skeleton short" style="height:28px;width:60px;"></div><div class="metric-label">Loading…</div></div>
+        <div class="metric-card">
+          <div class="metric-icon">🗂️</div>
+          <div class="metric-value">17,960</div>
+          <div class="metric-label">Total Pairs</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">📐</div>
+          <div class="metric-value">12</div>
+          <div class="metric-label">Aspect Categories</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">🎭</div>
+          <div class="metric-value">3</div>
+          <div class="metric-label">Sentiment Classes</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">📈</div>
+          <div class="metric-value" style="color:#6366f1;">13.4k</div>
+          <div class="metric-label">Train Set</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">🔍</div>
+          <div class="metric-value" style="color:#f59e0b;">1.8k</div>
+          <div class="metric-label">Val Set</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">🎯</div>
+          <div class="metric-value" style="color:#10b981;">2.7k</div>
+          <div class="metric-label">Test Set</div>
+        </div>
       </div>
 
-      <!-- Domains & Sources table -->
-      <p class="section-label">Loaded Datasets &amp; Sources</p>
+      <!-- Train/Val/Test Split table -->
+      <p class="section-label">Dataset Splits (FABSA)</p>
       <div class="ds-table-card">
         <table class="ds-table">
           <thead><tr>
-            <th>Domain</th>
-            <th>Source Company</th>
-            <th>Reviews</th>
-            <th>Aspects Detected</th>
-            <th>Sentiment Breakdown</th>
+            <th>Split</th>
+            <th style="text-align:right;">Pairs</th>
+            <th style="text-align:right;">Percentage</th>
+            <th>Purpose</th>
           </tr></thead>
-          <tbody id="ds-domains-tbody">
-            <tr><td colspan="5" style="text-align:center;padding:2rem;color:#94a3b8;">Loading…</td></tr>
+          <tbody>
+            <tr>
+              <td style="font-weight:600;"><span style="color:#6366f1;margin-right:8px;">●</span>Train</td>
+              <td style="text-align:right;font-weight:600;">13,400</td>
+              <td style="text-align:right;color:#64748b;">74.6%</td>
+              <td>LoRA Fine-tuning of the DeBERTa-v3 model</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;"><span style="color:#f59e0b;margin-right:8px;">●</span>Validation</td>
+              <td style="text-align:right;font-weight:600;">1,819</td>
+              <td style="text-align:right;color:#64748b;">10.1%</td>
+              <td>Hyperparameter tuning &amp; generalization monitoring</td>
+            </tr>
+            <tr>
+              <td style="font-weight:600;"><span style="color:#10b981;margin-right:8px;">●</span>Test</td>
+              <td style="text-align:right;font-weight:600;">2,741</td>
+              <td style="text-align:right;color:#64748b;">15.3%</td>
+              <td>Final model performance evaluation</td>
+            </tr>
+            <tr style="background:#f8fafc;border-top:2px solid #e2e8f0;">
+              <td style="font-weight:700;color:#0f172a;">Total Pairs</td>
+              <td style="text-align:right;font-weight:700;color:#0f172a;">17,960</td>
+              <td style="text-align:right;font-weight:700;color:#0f172a;">100%</td>
+              <td></td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -727,6 +879,200 @@ tbody td.col-num {
             <th>Description</th>
           </tr></thead>
           <tbody id="ds-catalog-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── Model Performance view ──────────────────────────────── -->
+    <div id="view-perf" class="view">
+      <h1 class="page-title">Model Performance</h1>
+      <p class="page-sub">Side-by-side evaluation of the pre-trained ABSA base model vs our LoRA fine-tuned model on the FABSA test set (2,741 pairs).</p>
+
+      <!-- Delta improvement cards -->
+      <div class="perf-delta-grid">
+        <div class="perf-delta-card">
+          <div class="perf-delta-label">Accuracy</div>
+          <div class="perf-delta-values">
+            <span class="perf-val-base">84.8%</span>
+            <span class="perf-val-arrow">→</span>
+            <span class="perf-val-tuned">94.1%</span>
+          </div>
+          <span class="perf-delta-badge">▲ +9.3 pp</span>
+        </div>
+        <div class="perf-delta-card">
+          <div class="perf-delta-label">Macro F1</div>
+          <div class="perf-delta-values">
+            <span class="perf-val-base">70.3%</span>
+            <span class="perf-val-arrow">→</span>
+            <span class="perf-val-tuned">89.0%</span>
+          </div>
+          <span class="perf-delta-badge">▲ +18.7 pp</span>
+        </div>
+        <div class="perf-delta-card">
+          <div class="perf-delta-label">Weighted F1</div>
+          <div class="perf-delta-values">
+            <span class="perf-val-base">85.6%</span>
+            <span class="perf-val-arrow">→</span>
+            <span class="perf-val-tuned">94.1%</span>
+          </div>
+          <span class="perf-delta-badge">▲ +8.5 pp</span>
+        </div>
+      </div>
+
+      <!-- Model details -->
+      <p class="section-label">Models Compared</p>
+      <div class="perf-model-grid">
+        <div class="perf-model-card">
+          <div class="perf-model-badge">Base ABSA</div>
+          <div class="perf-model-name">yangheng/deberta-v3-base-absa-v1.1</div>
+          <div class="perf-model-desc">Fine-tuned on SemEval ABSA datasets (restaurant &amp; laptop reviews). Not adapted to the FABSA taxonomy.</div>
+        </div>
+        <div class="perf-model-card perf-highlight">
+          <div class="perf-model-badge" style="color:#6366f1;">Fine-tuned ★</div>
+          <div class="perf-model-name">DeBERTa-v3 + LoRA (r=16, α=32)</div>
+          <div class="perf-model-desc">Further fine-tuned on FABSA training set (13,400 pairs) across fintech, fashion, e-commerce &amp; travel domains.</div>
+        </div>
+      </div>
+
+      <!-- Training details -->
+      <p class="section-label">LoRA Fine-tuning Configuration</p>
+      <div class="perf-model-grid" style="grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 2rem;">
+        <div class="metric-card" style="padding: 1rem 1.25rem;">
+          <div class="metric-label" style="font-size: 0.65rem;">PEFT Strategy</div>
+          <div class="metric-value" style="font-size: 1.1rem; color: #6366f1;">LoRA</div>
+        </div>
+        <div class="metric-card" style="padding: 1rem 1.25rem;">
+          <div class="metric-label" style="font-size: 0.65rem;">LoRA Rank (r) / Alpha</div>
+          <div class="metric-value" style="font-size: 1.1rem;">16 / 32</div>
+        </div>
+        <div class="metric-card" style="padding: 1rem 1.25rem;">
+          <div class="metric-label" style="font-size: 0.65rem;">Target Modules</div>
+          <div class="metric-value" style="font-size: 0.95rem; margin-top: 2px;">query_proj, value_proj</div>
+        </div>
+        <div class="metric-card" style="padding: 1rem 1.25rem;">
+          <div class="metric-label" style="font-size: 0.65rem;">Dropout</div>
+          <div class="metric-value" style="font-size: 1.1rem;">0.1</div>
+        </div>
+        <div class="metric-card" style="padding: 1rem 1.25rem;">
+          <div class="metric-label" style="font-size: 0.65rem;">Epochs</div>
+          <div class="metric-value" style="font-size: 1.1rem;">5</div>
+        </div>
+        <div class="metric-card" style="padding: 1rem 1.25rem;">
+          <div class="metric-label" style="font-size: 0.65rem;">Effective Batch Size</div>
+          <div class="metric-value" style="font-size: 1.1rem;">16 <span style="font-size:0.75rem; color:#94a3b8; font-weight:normal;">(2 × 8 accum)</span></div>
+        </div>
+        <div class="metric-card" style="padding: 1rem 1.25rem;">
+          <div class="metric-label" style="font-size: 0.65rem;">Learning Rate</div>
+          <div class="metric-value" style="font-size: 1.1rem;">2e-5</div>
+        </div>
+        <div class="metric-card" style="padding: 1rem 1.25rem;">
+          <div class="metric-label" style="font-size: 0.65rem;">Max Sequence Length</div>
+          <div class="metric-value" style="font-size: 1.1rem;">256</div>
+        </div>
+      </div>
+
+      <!-- Per-class F1 bar comparison -->
+      <p class="section-label">Per-Sentiment Class F1 Score</p>
+      <div class="perf-legend">
+        <span><span class="perf-legend-dot dot-base"></span>Base ABSA Model</span>
+        <span><span class="perf-legend-dot dot-tuned"></span>LoRA Fine-tuned</span>
+      </div>
+      <div class="perf-bars-card">
+        <div class="perf-class-row">
+          <span class="perf-class-label">Positive</span>
+          <div class="perf-bar-track"><div class="perf-bar-fill bar-base" style="width:92%"></div></div>
+          <span class="perf-bar-val val-base">0.92</span>
+          <div class="perf-bar-track"><div class="perf-bar-fill bar-tuned" style="width:96%"></div></div>
+          <span class="perf-bar-val val-tuned">0.96</span>
+        </div>
+        <div class="perf-class-row">
+          <span class="perf-class-label">Negative</span>
+          <div class="perf-bar-track"><div class="perf-bar-fill bar-base" style="width:78%"></div></div>
+          <span class="perf-bar-val val-base">0.78</span>
+          <div class="perf-bar-track"><div class="perf-bar-fill bar-tuned" style="width:91%"></div></div>
+          <span class="perf-bar-val val-tuned">0.91</span>
+        </div>
+        <div class="perf-class-row">
+          <span class="perf-class-label">Neutral</span>
+          <div class="perf-bar-track"><div class="perf-bar-fill bar-base" style="width:41%"></div></div>
+          <span class="perf-bar-val val-base">0.41</span>
+          <div class="perf-bar-track"><div class="perf-bar-fill bar-tuned" style="width:80%"></div></div>
+          <span class="perf-bar-val val-tuned">0.80</span>
+        </div>
+      </div>
+
+      <!-- Detailed classification report -->
+      <p class="section-label">Detailed Classification Report</p>
+      <div class="ds-table-card">
+        <table class="ds-table">
+          <thead>
+            <tr>
+              <th rowspan="2">Class</th>
+              <th rowspan="2">Support</th>
+              <th colspan="3" style="text-align:center;border-bottom:1px solid #e2e8f0;">Base ABSA Model</th>
+              <th colspan="3" style="text-align:center;border-bottom:1px solid #e2e8f0;border-left:2px solid #cbd5e1;">FABSA Fine-tuned (LoRA)</th>
+            </tr>
+            <tr>
+              <th>Prec</th><th>Recall</th><th>F1</th>
+              <th style="border-left:2px solid #cbd5e1;">Prec</th><th>Recall</th><th>F1</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="aspect-pill pill-pos">● Positive</span></td>
+              <td style="font-weight:600;">1,776</td>
+              <td>0.89</td><td>0.94</td><td>0.92</td>
+              <td style="font-weight:600;border-left:2px solid #cbd5e1;">0.96</td>
+              <td style="font-weight:600;">0.96</td>
+              <td style="font-weight:600;color:#6366f1;">0.96</td>
+            </tr>
+            <tr>
+              <td><span class="aspect-pill pill-neg">● Negative</span></td>
+              <td style="font-weight:600;">875</td>
+              <td>0.95</td><td>0.66</td><td>0.78</td>
+              <td style="font-weight:600;border-left:2px solid #cbd5e1;">0.91</td>
+              <td style="font-weight:600;">0.92</td>
+              <td style="font-weight:600;color:#6366f1;">0.91</td>
+            </tr>
+            <tr>
+              <td><span class="aspect-pill pill-neu">● Neutral</span></td>
+              <td style="font-weight:600;">90</td>
+              <td>0.28</td><td>0.79</td><td>0.41</td>
+              <td style="font-weight:600;border-left:2px solid #cbd5e1;">0.84</td>
+              <td style="font-weight:600;">0.76</td>
+              <td style="font-weight:600;color:#6366f1;">0.80</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Per-aspect macro F1 comparison -->
+      <p class="section-label">Per-Aspect Macro F1 Comparison</p>
+      <div class="ds-table-card">
+        <table class="ds-table">
+          <thead>
+            <tr>
+              <th>Aspect Category</th>
+              <th style="text-align:center;">n</th>
+              <th style="text-align:center;">Base ABSA</th>
+              <th style="text-align:center;border-left:2px solid #cbd5e1;">Fine-tuned (LoRA)</th>
+              <th style="text-align:center;">Δ</th>
+            </tr>
+          </thead>
+          <tbody id="aspect-f1-tbody">
+            <tr><td><span class="catalog-slug">account-management.account-access</span></td><td style="text-align:center;color:#64748b;">79</td><td style="text-align:center;">0.698</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.881</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.183</span></td></tr>
+            <tr><td><span class="catalog-slug">company-brand.competitor</span></td><td style="text-align:center;color:#64748b;">120</td><td style="text-align:center;">0.517</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.910</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.393</span></td></tr>
+            <tr><td><span class="catalog-slug">company-brand.general-satisfaction</span></td><td style="text-align:center;color:#64748b;">570</td><td style="text-align:center;">0.625</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.622</td><td style="text-align:center;"><span class="perf-delta-badge" style="background:#fef2f2;border-color:#fca5a5;color:#dc2626;">▼ −0.003</span></td></tr>
+            <tr><td><span class="catalog-slug">company-brand.reviews</span></td><td style="text-align:center;color:#64748b;">38</td><td style="text-align:center;">0.429</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.918</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.489</span></td></tr>
+            <tr><td><span class="catalog-slug">logistics-rides.speed</span></td><td style="text-align:center;color:#64748b;">188</td><td style="text-align:center;">0.606</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.925</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.319</span></td></tr>
+            <tr><td><span class="catalog-slug">online-experience.app-website</span></td><td style="text-align:center;color:#64748b;">697</td><td style="text-align:center;">0.776</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.908</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.132</span></td></tr>
+            <tr><td><span class="catalog-slug">purchase-booking-experience.ease-of-use</span></td><td style="text-align:center;color:#64748b;">492</td><td style="text-align:center;">0.481</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.635</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.154</span></td></tr>
+            <tr><td><span class="catalog-slug">staff-support.attitude-of-staff</span></td><td style="text-align:center;color:#64748b;">201</td><td style="text-align:center;">0.582</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.613</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.031</span></td></tr>
+            <tr><td><span class="catalog-slug">staff-support.email</span></td><td style="text-align:center;color:#64748b;">22</td><td style="text-align:center;">0.555</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.915</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.360</span></td></tr>
+            <tr><td><span class="catalog-slug">staff-support.phone</span></td><td style="text-align:center;color:#64748b;">39</td><td style="text-align:center;">0.633</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.606</td><td style="text-align:center;"><span class="perf-delta-badge" style="background:#fef2f2;border-color:#fca5a5;color:#dc2626;">▼ −0.027</span></td></tr>
+            <tr><td><span class="catalog-slug">value.discounts-promotions</span></td><td style="text-align:center;color:#64748b;">89</td><td style="text-align:center;">0.720</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.821</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.101</span></td></tr>
+            <tr><td><span class="catalog-slug">value.price-value-for-money</span></td><td style="text-align:center;color:#64748b;">206</td><td style="text-align:center;">0.537</td><td style="text-align:center;border-left:2px solid #cbd5e1;font-weight:600;color:#6366f1;">0.598</td><td style="text-align:center;"><span class="perf-delta-badge">▲ +0.061</span></td></tr>
+          </tbody>
         </table>
       </div>
     </div>
@@ -1236,117 +1582,6 @@ async function loadDatasetInsights() {
   if (_datasetLoaded) return;
   _datasetLoaded = true;
 
-  try {
-    // 1. Fetch domain list
-    const domRes  = await fetch('/api/domains');
-    const domData = await domRes.json();
-    const domains = domData.domains || [];
-
-    // 2. Fetch stats for each domain in parallel
-    const statsArr = await Promise.all(
-      domains.map(d => fetch(`/api/stats?domain=${encodeURIComponent(d.domain)}`).then(r => r.json()))
-    );
-
-    // 3. Fetch first page of reviews per domain to get unique company names
-    const reviewsArr = await Promise.all(
-      domains.map(d => fetch(`/api/reviews?page=1&per_page=50&domain=${encodeURIComponent(d.domain)}`).then(r => r.json()))
-    );
-
-    // Aggregate totals
-    let totalReviews = 0, totalAspects = 0, totalPos = 0, totalNeg = 0, totalNeu = 0;
-    statsArr.forEach(s => {
-      totalReviews += s.n_reviews || 0;
-      const sc = s.sentiment_counts || {};
-      totalPos += sc.positive || 0;
-      totalNeg += sc.negative || 0;
-      totalNeu += sc.neutral  || 0;
-    });
-    totalAspects = totalPos + totalNeg + totalNeu;
-
-    // Render metric cards
-    document.getElementById('ds-metrics').innerHTML = `
-      <div class="metric-card">
-        <div class="metric-icon">🗂️</div>
-        <div class="metric-value">${domains.length}</div>
-        <div class="metric-label">Domains</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon">💬</div>
-        <div class="metric-value">${totalReviews}</div>
-        <div class="metric-label">Total Reviews</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon">🏷️</div>
-        <div class="metric-value">${totalAspects}</div>
-        <div class="metric-label">Aspects Detected</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon">📐</div>
-        <div class="metric-value">12</div>
-        <div class="metric-label">Aspect Categories</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon">✅</div>
-        <div class="metric-value" style="color:#16a34a;">${totalPos}</div>
-        <div class="metric-label">Positive</div>
-      </div>
-      <div class="metric-card">
-        <div class="metric-icon">❌</div>
-        <div class="metric-value" style="color:#dc2626;">${totalNeg}</div>
-        <div class="metric-label">Negative</div>
-      </div>
-    `;
-
-    // Render domains table
-    const tbody = document.getElementById('ds-domains-tbody');
-    tbody.innerHTML = domains.map((d, i) => {
-      const s = statsArr[i];
-      const sc = s.sentiment_counts || {};
-      const pos = sc.positive || 0, neg = sc.negative || 0, neu = sc.neutral || 0;
-      const tot = pos + neg + neu || 1;
-      const pctPos = Math.round(pos/tot*100), pctNeg = Math.round(neg/tot*100), pctNeu = 100 - pctPos - pctNeg;
-
-      // Unique companies from reviews
-      const reviews = (reviewsArr[i] && reviewsArr[i].reviews) || [];
-      const companies = [...new Set(reviews.map(r => r.company).filter(Boolean))];
-      const companyTags = companies.length
-        ? companies.map(c => `<span class="ds-company-tag">${esc(c)}</span>`).join('')
-        : '<span style="color:#94a3b8;font-size:0.78rem;">—</span>';
-
-      const domainLabel = DOMAIN_LABELS[d.domain] || titleCase(d.domain);
-      const icon = DOMAIN_ICONS[d.domain] || '📁';
-
-      return `<tr>
-        <td>
-          <div class="ds-domain-badge">
-            <span class="ds-domain-icon ${d.domain}">${icon}</span>
-            ${esc(domainLabel)}
-          </div>
-          <div class="ds-source-label">Trustpilot</div>
-        </td>
-        <td>${companyTags}</td>
-        <td style="font-weight:600;">${d.n_reviews}</td>
-        <td style="font-weight:600;">${s.total_aspects || tot}</td>
-        <td>
-          <div class="ds-sent-bar">
-            <div class="bar-seg-pos" style="width:${pctPos}%"></div>
-            <div class="bar-seg-neg" style="width:${pctNeg}%"></div>
-            <div class="bar-seg-neu" style="width:${pctNeu}%"></div>
-          </div>
-          <div class="ds-sent-legend">
-            <span><span class="dot dot-pos"></span>${pos}</span>
-            <span><span class="dot dot-neg"></span>${neg}</span>
-            <span><span class="dot dot-neu"></span>${neu}</span>
-          </div>
-        </td>
-      </tr>`;
-    }).join('');
-
-  } catch (e) {
-    document.getElementById('ds-metrics').innerHTML =
-      `<div class="metric-card" style="grid-column:1/-1;"><div style="color:#dc2626;">Failed to load: ${esc(e.message)}</div></div>`;
-  }
-
   // Render aspect catalog (static)
   const catBody = document.getElementById('ds-catalog-tbody');
   catBody.innerHTML = ASPECT_CATALOG.map(a => {
@@ -1367,6 +1602,7 @@ async function loadDatasetInsights() {
 // ── Boot ───────────────────────────────────────────────────────────────────────
 loadConfig();
 loadDomains();
+loadDatasetInsights();
 </script>
 </body>
 </html>
