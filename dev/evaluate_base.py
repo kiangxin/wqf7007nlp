@@ -137,7 +137,7 @@ def main():
         zero_division=0,
     ))
     
-    print(f"Accuracy   : {accuracy_score(labels, preds):.4f}")
+    print(f"Micro F1   : {f1_score(labels, preds, average='micro', zero_division=0):.4f}")
     print(f"Macro F1   : {f1_score(labels, preds, average='macro', zero_division=0):.4f}")
     print(f"Weighted F1: {f1_score(labels, preds, average='weighted', zero_division=0):.4f}")
 

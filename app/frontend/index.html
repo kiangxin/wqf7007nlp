@@ -671,7 +671,7 @@ tbody td.col-num {
         <span class="sb-model-val">DeBERTa-v3</span>
       </div>
       <div class="sb-model-row">
-        <span class="sb-model-key">Accuracy</span>
+        <span class="sb-model-key">Micro F1</span>
         <span class="sb-model-val highlight" id="sb-acsc-acc">—</span>
       </div>
       <div class="sb-model-row">
@@ -920,9 +920,10 @@ tbody td.col-num {
       </div>
 
       <!-- Delta improvement cards -->
+      <p class="section-label">ACSC Fine-Tuned Results</p>
       <div class="perf-delta-grid">
         <div class="perf-delta-card">
-          <div class="perf-delta-label">Accuracy</div>
+          <div class="perf-delta-label">Micro F1</div>
           <div class="perf-delta-values">
             <span class="perf-val-base">84.8%</span>
             <span class="perf-val-arrow">→</span>
@@ -960,8 +961,8 @@ tbody td.col-num {
         </div>
         <div class="perf-model-card perf-highlight">
           <div class="perf-model-badge" style="color:#6366f1;">Fine-tuned ★</div>
-          <div class="perf-model-name">DeBERTa-v3 + LoRA (r=16, α=32)</div>
-          <div class="perf-model-desc">Further fine-tuned on FABSA training set (13,400 pairs) across fintech, fashion, e-commerce &amp; travel domains.</div>
+          <div class="perf-model-name">Base ABSA + LoRA (r=16, α=32)</div>
+          <div class="perf-model-desc">Further fine-tuned from the Base ABSA model on the FABSA training set (13,400 pairs) across fintech, fashion, e-commerce &amp; travel domains.</div>
         </div>
       </div>
 
